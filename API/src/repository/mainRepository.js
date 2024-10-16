@@ -24,9 +24,9 @@ export async function listarTodos(tipo) {
     }
 }
 
-export async function listarPorId(tipo, id) {
+export async function listarPorId(tabela, busca, id) {
     try {
-        let comando = `SELECT * FROM ${tipo} WHERE id${tipo} = ?;`
+        let comando = `SELECT * FROM ${tabela} WHERE id${busca} = ?;`
         let resp = await con.query(comando, [id]);
         let linhas = resp[0];
         if (linhas.length === 0) return null;

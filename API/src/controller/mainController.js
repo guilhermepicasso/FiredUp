@@ -3,9 +3,10 @@ import multer from "multer";
 import { Router } from "express";
 
 import { deletarPorId, deletarTudo, listarPorId, listarTodos } from "../repository/mainRepository.js";
-import { alterarModalidade, novaModalidade } from "../repository/modalidadeRepository.js";
-import { alterarDisponibilidadeEspaco, alterarEspaco, novoEspaco } from "../repository/espacoRepository.js";
+import { alterarModalidade, inserirModalidadeEspaco, novaModalidade } from "../repository/modalidadeRepository.js";
+import { alterarDisponibilidadeEspaco, alterarEspaco, inserirDisponibilidade, inserirItemEspaco, novoEspaco } from "../repository/espacoRepository.js";
 import { alterarItem, alterarQtdDisponivelItem, novoItem } from "../repository/itemRepository.js";
+import { alterarEquipe, novaEquipe } from "../repository/equipeRepository.js";
 
 const servidor = Router();
 
@@ -21,11 +22,12 @@ servidor.get('/:tipo', async (req, resp) => {
     }
 });
 
-servidor.get('/:tipo/:id', async (req, resp) => {
+servidor.get('/:tabela/:busca/:id', async (req, resp) => {
     try {
-        const tipo = req.params.tipo;
+        const tabela = req.params.tabela;
+        const busca = req.params.busca;
         const id = req.params.id;
-        const resposta = await listarPorId(tipo, id);
+        const resposta = await listarPorId(tabela, busca, id);
         if (resposta) {
             resp.status(200).send(resposta);
         } else {
@@ -40,12 +42,16 @@ servidor.delete('/:tipo/:id', async (req, resp) => {
     try {
         const tipo = req.params.tipo;
         const id = req.params.id;
-        await deletarPorId(tipo, id);
-        resp.status(200).json("deletado com sucesso!");
+
+        // Exclui diretamente o registro da tabela principal
+        await deletarPorId(tipo, id);  // O CASCADE cuidará dos relacionamentos
+
+        return resp.status(200).json("Deletado com sucesso!");
     } catch (error) {
-        resp.status(500).json({ error: error.message });
+        return resp.status(500).json({ error: error.message });
     }
-})
+});
+
 
 servidor.delete('/:tipo', async (req, resp) => {
     try {
@@ -69,8 +75,19 @@ servidor.post('/:tipo', async (req, resp) => {
             resposta = await novaModalidade(body);
         } else if (tipo == "espaco") {
             resposta = await novoEspaco(body);
+        } else if (tipo == "disponibilidadeEspaco"){
+            resposta = await inserirDisponibilidade(body);
         } else if (tipo == "item"){
             resposta = await novoItem(body);
+        } else if (tipo == "itemEspaco"){
+            resposta = await inserirItemEspaco(body);
+        } else if (tipo == "modalidadeEspaco"){
+            resposta = await inserirModalidadeEspaco(body);
+        } else if (tipo == "equipe"){
+            resposta = await novaEquipe(body);
+        }
+        if (resposta.length === 0) {
+            resp.status(400).send({erro: "Erro ao inserir", tipo});
         }
         resp.send(resposta);
     } catch (error) {
@@ -101,6 +118,8 @@ servidor.put('/:tipo/:id', async (req, resp) => {
             resposta = await alterarQtdDisponivelItem(id, false, body);
         } else if (tipo == "disponibilidadeEspaco") {
             resposta = await alterarDisponibilidadeEspaco(id, body);
+        } else if (tipo == "equipe") {
+            resposta = await alterarEquipe(id, body);
         }
         resp.send(resposta);
     } catch (error) {

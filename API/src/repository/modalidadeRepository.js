@@ -27,3 +27,18 @@ export async function alterarModalidade(id, modalidade) {
         throw error;
     }
 }
+
+export async function inserirModalidadeEspaco(body) {
+    try {
+        let comando = `insert into ModalidadeEspaco (idModalidade, idEspaco) values (?, ?)`
+
+        let [resp] = await con.query(comando, [body.idModalidade, body.idEspaco])
+        body.idModalidadeEspaco = resp.insertId;
+        return body;
+    } catch (error) {
+        if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+            throw new Error('O ID do registrador é inválido.');
+        }
+        throw error;
+    }
+}
