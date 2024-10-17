@@ -3,11 +3,6 @@ import express from 'express'
 import cors from 'cors'
 
 import mainController from "../src/controller/mainController.js"
-import disponibilidadeController from "../src/controller/disponibilidadeController.js"
-
-import usuarioController from "../src/controller/usuarioController.js";
-import timeController from "../src/controller/timeController.js";
-import participanteController from "../src/controller/participanteController.js";
 import login from "../src/controller/login.js";
 
 
@@ -16,11 +11,6 @@ servidor.use(cors());
 servidor.use(express.json());
 
 servidor.use(mainController);
-servidor.use(disponibilidadeController);
-
-servidor.use(usuarioController);
-servidor.use(timeController);
-servidor.use(participanteController);
 servidor.use(login);
 
 

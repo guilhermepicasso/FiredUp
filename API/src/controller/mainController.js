@@ -2,15 +2,31 @@ import multer from "multer";
 
 import { Router } from "express";
 
-import { deletarPorId, deletarTudo, listarPorId, listarTodos } from "../repository/mainRepository.js";
-import { alterarModalidade, inserirModalidadeEspaco, novaModalidade } from "../repository/modalidadeRepository.js";
-import { alterarDisponibilidadeEspaco, alterarEspaco, inserirDisponibilidade, inserirItemEspaco, novoEspaco } from "../repository/espacoRepository.js";
-import { alterarItem, alterarQtdDisponivelItem, novoItem } from "../repository/itemRepository.js";
-import { alterarEquipe, novaEquipe } from "../repository/equipeRepository.js";
+import { alterar, criar, deletarPorId, deletarTudo, listarPorId, listarTodos } from "../repository/mainRepository.js";
+import { alterarQtdDisponivelItem } from "../repository/itemRepository.js";
 
 const servidor = Router();
 
 const upload = multer({ dest: 'storage/modalidade' });
+
+servidor.post('/:tabela', async (req, resp) => {
+    try {
+        const tabela = req.params.tabela;
+        const body = req.body;
+        var resposta = await criar(tabela, body);
+        if (resposta.length === 0) {
+            resp.status(400).send({erro: "Erro ao inserir na tabela " + tabela});
+        }
+        resp.send(resposta);
+    } catch (error) {
+        console.error("Erro ao cadastrar: ", error);
+        if (error.message === 'O ID do registrador é inválido.') {
+            resp.status(400).send({ erro: error.message });
+        } else {
+            resp.status(500).send({ erro: 'Erro interno do servidor.' });
+        }
+    }
+})
 
 servidor.get('/:tipo', async (req, resp) => {
     try {
@@ -52,81 +68,34 @@ servidor.delete('/:tipo/:id', async (req, resp) => {
     }
 });
 
-
-servidor.delete('/:tipo', async (req, resp) => {
-    try {
-        const tipo = req.params.tipo;
-        const id = req.params.id;
-        await deletarTudo(tipo);
-        resp.status(200).json("deletado com sucesso!");
-    } catch (error) {
-        resp.status(500).json({ error: error.message });
-    }
-})
-
-
-
-servidor.post('/:tipo', async (req, resp) => {
-    try {
-        const tipo = req.params.tipo;
-        const body = req.body;
-        var resposta = []
-        if (tipo == "modalidade") {
-            resposta = await novaModalidade(body);
-        } else if (tipo == "espaco") {
-            resposta = await novoEspaco(body);
-        } else if (tipo == "disponibilidadeEspaco"){
-            resposta = await inserirDisponibilidade(body);
-        } else if (tipo == "item"){
-            resposta = await novoItem(body);
-        } else if (tipo == "itemEspaco"){
-            resposta = await inserirItemEspaco(body);
-        } else if (tipo == "modalidadeEspaco"){
-            resposta = await inserirModalidadeEspaco(body);
-        } else if (tipo == "equipe"){
-            resposta = await novaEquipe(body);
-        }
-        if (resposta.length === 0) {
-            resp.status(400).send({erro: "Erro ao inserir", tipo});
-        }
-        resp.send(resposta);
-    } catch (error) {
-        console.error("Erro ao cadastrar: ", error);
-        if (error.message === 'O ID do registrador é inválido.') {
-            resp.status(400).send({ erro: error.message });
-        } else {
-            resp.status(500).send({ erro: 'Erro interno do servidor.' });
-        }
-    }
-})
-
 servidor.put('/:tipo/:id', async (req, resp) => {
     try {
         const tipo = req.params.tipo;
         const id = req.params.id;
         const body = req.body;
         var resposta = []
-        if (tipo == "modalidade") {
-            resposta = await alterarModalidade(id, body);
-        } else if (tipo == "espaco") {
-            resposta = await alterarEspaco(id, body);
-        } else if (tipo == "item") {
-            resposta = await alterarItem(id, body);
-        } else if (tipo == "retiradaItem") {
+        if (tipo == "retiradaItem") {
             resposta = await alterarQtdDisponivelItem(id, true, body);
         } else if (tipo == "devolucaoItem") {
             resposta = await alterarQtdDisponivelItem(id, false, body);
-        } else if (tipo == "disponibilidadeEspaco") {
-            resposta = await alterarDisponibilidadeEspaco(id, body);
-        } else if (tipo == "equipe") {
-            resposta = await alterarEquipe(id, body);
+        } else {
+            resposta = await alterar(tipo, id, body);
         }
         resp.send(resposta);
     } catch (error) {
-        resp.status(500).send({ erro: 'Erro interno do servidor.' });
+        resp.status(500).send({ erro: 'Erro interno do servidor.', error });
     }
 })
 
-
+//cuidado, usar somente se for de extrema necessidade, pois excluirá TODAS AS INFORMAÇÕES
+servidor.delete('/:tipo', async (req, resp) => {
+    try {
+        const tipo = req.params.tipo;
+        await deletarTudo(tipo);
+        resp.status(200).json("deletado com sucesso!");
+    } catch (error) {
+        resp.status(500).json({ error: error.message });
+    }
+})
 
 export default servidor;
