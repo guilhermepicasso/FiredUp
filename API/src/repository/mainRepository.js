@@ -37,24 +37,37 @@ export async function listarTodos(tipo) {
 
 export async function listarPorId(tabela, busca, id) {
     try {
-        console.log("entrou no listar por id para buscar "+tabela);
         if (tabela === "usuario") {
             let usuario = usuarios.find(u => u.RA === id);
-
-            // Se não encontrar o usuário, retorna null ou vazio
             if (!usuario) {
                 return null;
             }
-
-            // Retorna o usuário encontrado
             return usuario;
         } else {
-            let comando = `SELECT * FROM ${tabela} WHERE id${busca} = ?;`
-            let resp = await con.query(comando, [id]);
-            let linhas = resp[0];
-            if (linhas.length === 0) return null;
-            return linhas;
+            let comando = `SELECT * FROM ${tabela} WHERE ${busca} = ${id};`
+            let resp = await con.query(comando);
+            if (resp[0].length === 0) {
+                const error = new Error(`Resource not found: id${tabela} = ${id}`);
+                error.status = 404;
+                throw error;
+            }
+            return resp[0];
         }
+    } catch (error) {
+        throw error;
+    }
+}
+
+export async function listarReservasUsuario(id) {
+    try {
+        let comando = `SELECT r.* FROM Reserva r LEFT JOIN Equipe e ON r.idEquipe = e.idEquipe WHERE r.idResponsavel = "${id}" OR e.idResponsavel = "${id}";`
+        let resp = await con.query(comando);
+        if (resp[0].length === 0) {
+            const error = new Error(`Resource not found: ${id}`);
+            error.status = 404;
+            throw error;
+        }
+        return resp[0];
     } catch (error) {
         throw error;
     }
@@ -68,6 +81,9 @@ export async function criar(tipo, body) {
         const keys = Object.keys(body);
         keys.forEach((key, index) => {
             // Adicionar o campo e o valor dinâmico
+            if (typeof body[key] === 'boolean') {
+                body[key] = body[key] ? 1 : 0;
+            }
             comando += `${key}`;
 
             // Adicionar uma vírgula se não for o último item
@@ -84,12 +100,24 @@ export async function criar(tipo, body) {
         body.id = resp.insertId;
         return body;
     } catch (error) {
+
+
+        var customError = "";
         if (error.code === 'ER_NO_REFERENCED_ROW_2') {
-            throw new Error('O ID do registrador é inválido.');
+            customError = new Error(`O ID do ${tipo} é inválido.`);
+            customError.status = 400;
+            throw customError;
+        } else if (error.code === 'ER_DUP_ENTRY') {
+            customError = new Error(`Valor duplicado`);
+            customError.status = 401;
+            throw customError;
         }
         throw error;
     }
 }
+
+
+
 
 export async function alterar(tipo, id, body) {
     try {
@@ -102,7 +130,14 @@ export async function alterar(tipo, id, body) {
             }
         });
         comando += ` WHERE id${tipo} = ${id}`;
-        await con.query(comando);
+
+        let [resp] = await con.query(comando);
+
+        if (resp.affectedRows === 0) {
+            const error = new Error(`Resource not found: id${tipo} = ${id}`);
+            error.status = 404;
+            throw error;
+        }
         return body;
     } catch (error) {
         throw error;
@@ -111,12 +146,15 @@ export async function alterar(tipo, id, body) {
 
 export async function deletarPorId(tipo, id) {
     try {
-        let comando = `DELETE FROM ${tipo} WHERE id${tipo} = ?`
-        let resp = await con.query(comando, [id]);
-        if (resp[0].affectedRows !== 1) {
-            throw new Error('Erro ao tentar deletar!');
+        let comando = `DELETE FROM ${tipo} WHERE id${tipo} = ${id}`
+        let [resp] = await con.query(comando);
+
+        if (resp.affectedRows === 0) {
+            const error = new Error(`Resource not found: id${tipo} = ${id}`);
+            error.status = 404;
+            throw error;
         }
-        return resp[0];
+        return resp;
     } catch (error) {
         throw error;
     }

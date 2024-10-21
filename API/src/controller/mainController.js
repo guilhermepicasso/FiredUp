@@ -2,7 +2,7 @@ import multer from "multer";
 
 import { Router } from "express";
 
-import { alterar, criar, deletarPorId, deletarTudo, listarPorId, listarTodos } from "../repository/mainRepository.js";
+import { alterar, criar, deletarPorId, deletarTudo, listarPorId, listarReservasUsuario, listarTodos } from "../repository/mainRepository.js";
 import { alterarQtdDisponivelItem } from "../repository/itemRepository.js";
 
 const servidor = Router();
@@ -15,16 +15,14 @@ servidor.post('/:tabela', async (req, resp) => {
         const body = req.body;
         var resposta = await criar(tabela, body);
         if (resposta.length === 0) {
-            resp.status(400).send({erro: "Erro ao inserir na tabela " + tabela});
+            resp.status(400).send({ erro: "Erro ao inserir na tabela " + tabela });
         }
         resp.send(resposta);
     } catch (error) {
-        console.error("Erro ao cadastrar: ", error);
-        if (error.message === 'O ID do registrador é inválido.') {
-            resp.status(400).send({ erro: error.message });
-        } else {
-            resp.status(500).send({ erro: 'Erro interno do servidor.' });
-        }
+        console.log(error);
+        const statusCode = error.status || 500;
+        const errorMessage = error.message || 'Erro interno do servidor.';
+        resp.status(statusCode).send({ erro: errorMessage });
     }
 })
 
@@ -38,35 +36,32 @@ servidor.get('/:tipo', async (req, resp) => {
     }
 });
 
+servidor.get('/:tipo/:id', async (req, resp) => {
+    try {
+        const tipo = req.params.tipo;
+        const id = req.params.id;
+        const resposta = await listarReservasUsuario(id);
+        resp.status(200).send(resposta);
+    } catch (error) {
+        resp.status(500).send({ erro: 'Erro interno do servidor.' });
+    }
+});
+
 servidor.get('/:tabela/:busca/:id', async (req, resp) => {
     try {
         const tabela = req.params.tabela;
         const busca = req.params.busca;
         const id = req.params.id;
         const resposta = await listarPorId(tabela, busca, id);
-        if (resposta) {
-            resp.status(200).send(resposta);
-        } else {
-            resp.status(400).json("Não encontrado")
-        }
+        resp.status(200).send(resposta);
     } catch (error) {
-        resp.status(500).send({ erro: 'Erro interno do servidor.' });
+        if (error.status === 404) {
+            resp.status(404).send({ erro: 'Id não encontrado.' });
+        } else {
+            resp.status(500).send({ erro: 'Erro interno do servidor.', error });
+        }
     }
 })
-
-servidor.delete('/:tipo/:id', async (req, resp) => {
-    try {
-        const tipo = req.params.tipo;
-        const id = req.params.id;
-
-        // Exclui diretamente o registro da tabela principal
-        await deletarPorId(tipo, id);  // O CASCADE cuidará dos relacionamentos
-
-        return resp.status(200).json("Deletado com sucesso!");
-    } catch (error) {
-        return resp.status(500).json({ error: error.message });
-    }
-});
 
 servidor.put('/:tipo/:id', async (req, resp) => {
     try {
@@ -83,9 +78,33 @@ servidor.put('/:tipo/:id', async (req, resp) => {
         }
         resp.send(resposta);
     } catch (error) {
-        resp.status(500).send({ erro: 'Erro interno do servidor.', error });
+        if (error.status === 404) {
+            resp.status(404).send({ erro: 'Id não encontrado.' });
+        } else if (error.status === 400) {
+            resp.status(400).send({ erro: 'Valores não correspondentes.', error });
+        } else {
+            resp.status(500).send({ erro: 'Erro interno do servidor.', error });
+        }
     }
 })
+
+servidor.delete('/:tipo/:id', async (req, resp) => {
+    try {
+        const tipo = req.params.tipo;
+        const id = req.params.id;
+
+        // Exclui diretamente o registro da tabela principal
+        await deletarPorId(tipo, id);  // O CASCADE cuidará dos relacionamentos
+
+        return resp.status(200).json("Deletado com sucesso!");
+    } catch (error) {
+        if (error.status === 404) {
+            resp.status(404).send({ erro: 'Id não encontrado.' });
+        } else {
+            resp.status(500).send({ erro: 'Erro interno do servidor.', error });
+        }
+    }
+});
 
 //cuidado, usar somente se for de extrema necessidade, pois excluirá TODAS AS INFORMAÇÕES
 servidor.delete('/:tipo', async (req, resp) => {
@@ -94,7 +113,11 @@ servidor.delete('/:tipo', async (req, resp) => {
         await deletarTudo(tipo);
         resp.status(200).json("deletado com sucesso!");
     } catch (error) {
-        resp.status(500).json({ error: error.message });
+        if (error.status === 404) {
+            resp.status(404).send({ erro: 'Id não encontrado.' });
+        } else {
+            resp.status(500).send({ erro: 'Erro interno do servidor.', error });
+        }
     }
 })
 
