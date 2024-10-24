@@ -1,19 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import App from './Pages/Exemplo/App';
-import Login from './Pages/Login/index';
+
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 import reportWebVitals from './reportWebVitals';
+import Navigation from './routes';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<App />} />
-        <Route path='/Login' element={<Login />} />
-      </Routes>
-    </BrowserRouter>
+  <React.StrictMode>
+    <ToastContainer />
+    <Navigation />
+  </React.StrictMode>
 );
 
 
