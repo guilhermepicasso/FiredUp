@@ -10,8 +10,8 @@ const servidor = express();
 servidor.use(cors());
 servidor.use(express.json());
 
-servidor.use(mainController);
 servidor.use(login);
+servidor.use(mainController);
 
 
 servidor.use('/storage/fotos', express.static('storage/fotos'));
