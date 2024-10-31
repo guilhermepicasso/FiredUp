@@ -1,10 +1,10 @@
 import con from "../conection.js";
 
 const usuarios = [
-    { RA: '123456', nome: 'Aline Ponzani' },
-    { RA: '654321', nome: 'João Silva' },
-    { RA: '112233', nome: 'Maria Oliveira' },
-    { RA: '445566', nome: 'Carlos Souza' }
+    { RA: '123456', nome: 'AlinePonzani' },
+    { RA: '654321', nome: 'JoãoSilva' },
+    { RA: '112233', nome: 'MariaOliveira' },
+    { RA: '445566', nome: 'CarlosSouza' }
 ];
 
 export async function alterarImagem(tipo, id, caminho) {
