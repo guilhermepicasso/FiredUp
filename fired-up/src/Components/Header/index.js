@@ -1,23 +1,27 @@
+import { useNavigate } from 'react-router-dom';
 import './index.scss';
 
 function Header() {
+  
+  const nomeUsuario = '';
+  const navigate = useNavigate();
+
+  const voltarHome = () => {navigate("/")};
   return (
-    <div className="Header">
-      <header className="App-header">
-        <img src='/Assets/images/logo.svg' className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <header>
+     <img src="Logo.png" alt="Logo marca da FiredUp" onClick={voltarHome}/>
+        <div className="sessoes">
+          <a href="#times">times</a>
+          <a href="#meuTime">meu time</a>
+          <a href="#sobre">sobre</a>
+        </div>
+        <div className="login">
+          {nomeUsuario === "" ?
+            <div className="nomeUsuario">Login</div> :
+            <div>{nomeUsuario}</div>
+          }
+        </div>
+    </header>
   );
 }
 

@@ -1,0 +1,33 @@
+.footer {
+  color: var(--preto-principal);
+  display: flex;
+  justify-content: space-between;
+  padding: 5vw 10vw;
+
+  h1 {
+    color: var(--laranja-principal);
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 2vw;
+    margin: 0;
+  }
+
+  .footerChildren {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .info {
+    font-size: 1.5vw;
+    margin: 0;
+    padding: 2vw;
+    display: flex;
+    gap: 2vw;
+    font-size: 1.7vw;
+  }
+  .icon {
+    color: var(--preto-principal);
+    font-size: 3vw;
+  }
+}
