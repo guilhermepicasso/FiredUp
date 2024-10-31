@@ -1,8 +1,10 @@
 .footer {
+  max-height: 15vh;
   color: var(--preto-principal);
   display: flex;
   justify-content: space-between;
   padding: 5vw 10vw;
+  background-color: white;
 
   h1 {
     color: var(--laranja-principal);

@@ -1,11 +1,11 @@
 import './index.scss'
-import { Link } from 'react-router-dom'
+// import { Link } from 'react-router-dom'
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { login } from '../../Api/firedUpApi';
-import { API_ADDRESS } from '../../Api/constant';
+import { login } from '../../API/firedUpApi.js';
+// import { API_ADDRESS } from '../../API/constant.js';
 import { toast } from 'react-toastify'
-import axios from 'axios';
+// import axios from 'axios';
 
 function Login() {
     const [ra, setRa] = useState('');

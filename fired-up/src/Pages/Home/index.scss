@@ -4,12 +4,12 @@
     background-image: url("../../../public/imgPrincipal.png");
     background-position: center;
     background-size: cover;
-    height: 80vh;
+    height: 75vh;
   }
 
-  @media (max-width: 1600px) {
+  @media (max-width: 1200px) {
     .container {
-      height: 50vh;
+      height: 65vw;
     }
   }
 }

@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import Sobre from "./HomeComponents/Sobre";
 import Footer from "../../Components/Footer";
 
-
 function HomeView() {
   const [modalidades, setModalidades] = useState([]);
 
@@ -25,23 +24,30 @@ function HomeView() {
     fetchData();
   }, []);
 
+  // Função de rolagem
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="HomeView">
-      <Header />
+      {/* Passando a função scrollToSection como prop */}
+      <Header scrollToSection={scrollToSection} />
 
       <section className="container" />
 
       <section id="modalidades">
-        <Modalidades modalidades={modalidades}></Modalidades>
+        <Modalidades modalidades={modalidades} />
       </section>
 
-      <section>
-        <Sobre></Sobre>
+      <section id="sobre">
+        <Sobre />
       </section>
 
-    ;<footer>
-<Footer></Footer>
-    </footer>
+      <Footer />
     </div>
   );
 }
