@@ -2,12 +2,12 @@ import multer from "multer";
 
 import { Router } from "express";
 
-import { alterar, criar, deletarPorId, deletarTudo, listarPorId, listarReservasUsuario, listarTodos } from "../repository/mainRepository.js";
+import { alterar, alterarImagem, criar, deletarPorId, deletarTudo, listarPorId, listarReservasUsuario, listarTodos } from "../repository/mainRepository.js";
 import { alterarQtdDisponivelItem } from "../repository/itemRepository.js";
 
 const servidor = Router();
 
-const upload = multer({ dest: 'storage/modalidade' });
+const upload = multer({ dest: 'storage/imagens' });
 
 servidor.post('/:tabela', async (req, resp) => {
     try {
@@ -26,19 +26,19 @@ servidor.post('/:tabela', async (req, resp) => {
     }
 })
 
-servidor.get('/:tipo', async (req, resp) => {
+servidor.get('/:tabela', async (req, resp) => {
     try {
-        const tipo = req.params.tipo;
-        const resposta = await listarTodos(tipo);
+        const tabela = req.params.tabela;
+        const resposta = await listarTodos(tabela);
         resp.status(200).send(resposta);
     } catch (error) {
         resp.status(500).send({ erro: 'Erro interno do servidor.' });
     }
 });
 
-servidor.get('/:tipo/:id', async (req, resp) => {
+servidor.get('/:tabela/:id', async (req, resp) => {
     try {
-        const tipo = req.params.tipo;
+        const tabela = req.params.tabela;
         const id = req.params.id;
         const resposta = await listarReservasUsuario(id);
         resp.status(200).send(resposta);
@@ -63,18 +63,18 @@ servidor.get('/:tabela/:busca/:id', async (req, resp) => {
     }
 })
 
-servidor.put('/:tipo/:id', async (req, resp) => {
+servidor.put('/:tabela/:id', async (req, resp) => {
     try {
-        const tipo = req.params.tipo;
+        const tabela = req.params.tabela;
         const id = req.params.id;
         const body = req.body;
         var resposta = []
-        if (tipo == "retiradaItem") {
+        if (tabela == "retiradaItem") {
             resposta = await alterarQtdDisponivelItem(id, true, body);
-        } else if (tipo == "devolucaoItem") {
+        } else if (tabela == "devolucaoItem") {
             resposta = await alterarQtdDisponivelItem(id, false, body);
         } else {
-            resposta = await alterar(tipo, id, body);
+            resposta = await alterar(tabela, id, body);
         }
         resp.send(resposta);
     } catch (error) {
@@ -88,13 +88,13 @@ servidor.put('/:tipo/:id', async (req, resp) => {
     }
 })
 
-servidor.delete('/:tipo/:id', async (req, resp) => {
+servidor.delete('/:tabela/:id', async (req, resp) => {
     try {
-        const tipo = req.params.tipo;
+        const tabela = req.params.tabela;
         const id = req.params.id;
 
         // Exclui diretamente o registro da tabela principal
-        await deletarPorId(tipo, id);  // O CASCADE cuidará dos relacionamentos
+        await deletarPorId(tabela, id);  // O CASCADE cuidará dos relacionamentos
 
         return resp.status(200).json("Deletado com sucesso!");
     } catch (error) {
@@ -107,10 +107,10 @@ servidor.delete('/:tipo/:id', async (req, resp) => {
 });
 
 //cuidado, usar somente se for de extrema necessidade, pois excluirá TODAS AS INFORMAÇÕES
-servidor.delete('/:tipo', async (req, resp) => {
+servidor.delete('/:tabela', async (req, resp) => {
     try {
-        const tipo = req.params.tipo;
-        await deletarTudo(tipo);
+        const tabela = req.params.tabela;
+        await deletarTudo(tabela);
         resp.status(200).json("deletado com sucesso!");
     } catch (error) {
         if (error.status === 404) {
@@ -120,5 +120,31 @@ servidor.delete('/:tipo', async (req, resp) => {
         }
     }
 })
+
+
+// Alterar image
+servidor.put('/imagem/:tabela/:id', upload.single('imagens'), async (req, resp) => {
+    console.log("entrou na função de editar imagem");
+    
+    try {
+        const tabela = req.params.tabela;
+        const id = req.params.id;
+        let imagem = req.file.path;
+        console.log(imagem);
+        let linhasAfetadas = await alterarImagem(tabela, id, imagem);
+        console.log(linhasAfetadas);
+        if (linhasAfetadas == 0) {
+            resp.status(404).send();
+        }else{
+            resp.status(202).send();
+        }
+    } catch (error) {
+
+        resp.status(500).json({ error: error.message });
+    }
+})
+
+
+
 
 export default servidor;

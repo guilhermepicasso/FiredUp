@@ -14,7 +14,7 @@ servidor.use(login);
 servidor.use(mainController);
 
 
-servidor.use('/storage/fotos', express.static('storage/fotos'));
+servidor.use('/storage/imagens', express.static('storage/imagens'));
 
 servidor.use((err, req, res, next) => {
     console.error(err.stack);

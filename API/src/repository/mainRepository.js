@@ -7,25 +7,14 @@ const usuarios = [
     { RA: '445566', nome: 'CarlosSouza' }
 ];
 
-export async function alterarImagem(tipo, id, caminho) {
-    try {
-        let comando = `update ${tipo} set foto = ? where id${tipo} = ?;`
-        let [resp] = await con.query(comando, [caminho, id]);
-        if (resp.affectedRows !== 1) {
-            throw new Error('Erro ao atualizar foto');
-        }
-        return resp.affectedRows;
-    } catch (error) {
-        throw error;
-    }
-}
 
-export async function listarTodos(tipo) {
+
+export async function listarTodos(tabela) {
     try {
-        if (tipo === "usuario") {
+        if (tabela === "usuario") {
             return usuarios;
         } else {
-            let comando = `SELECT * FROM ${tipo};`
+            let comando = `SELECT * FROM ${tabela};`
             let resp = await con.query(comando, []);
             let linhas = resp[0];
             return linhas;
@@ -73,9 +62,9 @@ export async function listarReservasUsuario(id) {
     }
 }
 
-export async function criar(tipo, body) {
+export async function criar(tabela, body) {
     try {
-        var comando = `insert into ${tipo} (`;
+        var comando = `insert into ${tabela} (`;
 
         // Obter as chaves do objeto body e iterar sobre elas
         const keys = Object.keys(body);
@@ -104,7 +93,7 @@ export async function criar(tipo, body) {
 
         var customError = "";
         if (error.code === 'ER_NO_REFERENCED_ROW_2') {
-            customError = new Error(`O ID do ${tipo} é inválido.`);
+            customError = new Error(`O ID do ${tabela} é inválido.`);
             customError.status = 400;
             throw customError;
         } else if (error.code === 'ER_DUP_ENTRY') {
@@ -116,12 +105,9 @@ export async function criar(tipo, body) {
     }
 }
 
-
-
-
-export async function alterar(tipo, id, body) {
+export async function alterar(tabela, id, body) {
     try {
-        var comando = `UPDATE ${tipo} SET `;
+        var comando = `UPDATE ${tabela} SET `;
         const keys = Object.keys(body);
         keys.forEach((key, index) => {
             comando += `${key} = '${body[key]}'`;
@@ -129,12 +115,12 @@ export async function alterar(tipo, id, body) {
                 comando += ', ';
             }
         });
-        comando += ` WHERE id${tipo} = ${id}`;
+        comando += ` WHERE id${tabela} = ${id}`;
 
         let [resp] = await con.query(comando);
 
         if (resp.affectedRows === 0) {
-            const error = new Error(`Resource not found: id${tipo} = ${id}`);
+            const error = new Error(`Resource not found: id${tabela} = ${id}`);
             error.status = 404;
             throw error;
         }
@@ -144,13 +130,13 @@ export async function alterar(tipo, id, body) {
     }
 }
 
-export async function deletarPorId(tipo, id) {
+export async function deletarPorId(tabela, id) {
     try {
-        let comando = `DELETE FROM ${tipo} WHERE id${tipo} = ${id}`
+        let comando = `DELETE FROM ${tabela} WHERE id${tabela} = ${id}`
         let [resp] = await con.query(comando);
 
         if (resp.affectedRows === 0) {
-            const error = new Error(`Resource not found: id${tipo} = ${id}`);
+            const error = new Error(`Resource not found: id${tabela} = ${id}`);
             error.status = 404;
             throw error;
         }
@@ -160,9 +146,9 @@ export async function deletarPorId(tipo, id) {
     }
 }
 
-export async function deletarTudo(tipo) {
+export async function deletarTudo(tabela) {
     try {
-        let comando = `DELETE FROM ${tipo}`;
+        let comando = `DELETE FROM ${tabela}`;
         let resp = await con.query(comando);
         if (resp[0].affectedRows === 0) {
             throw new Error('Nenhuma linha foi deletada.');
@@ -173,3 +159,19 @@ export async function deletarTudo(tipo) {
     }
 }
 
+export async function alterarImagem(link, id, caminho) {
+    try {
+        let comando = `update ${link} set foto = "${caminho}" where id${link} = ${id};`
+        console.log(comando);
+        
+        let [resp] = await con.query(comando);
+        if (resp.affectedRows === 0) {
+            const error = new Error(`Resource not found: ${link} = ${id}`);
+            error.status = 404;
+            throw error;
+        }
+        return resp.affectedRows;
+    } catch (error) {
+        throw error;
+    }
+}
