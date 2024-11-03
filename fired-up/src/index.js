@@ -9,6 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import reportWebVitals from './reportWebVitals';
 import Navigation from './routes';
+import Equipes from './Pages/Equipes';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -17,6 +18,7 @@ root.render(
       <Routes>
         <Route path='/' element={<App />} />
         <Route path='/Home' element={<HomeView />} />
+        <Route path='/Times' element={<Equipes />} />
       </Routes>
     </BrowserRouter>
     <ToastContainer />

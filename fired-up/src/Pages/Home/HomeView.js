@@ -4,25 +4,38 @@ import Modalidades from "./HomeComponents/Modalidades";
 import { useEffect, useState } from 'react';
 import Sobre from "./HomeComponents/Sobre";
 import Footer from "../../Components/Footer";
+import { buscarModalidades } from "../../API/chamadas";
 
 function HomeView() {
   const [modalidades, setModalidades] = useState([]);
 
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     try {
+  //       const response = await fetch('/modalidades.json');
+  //       if (!response.ok) {
+  //         throw new Error('Erro ao carregar o arquivo JSON');
+  //       }
+  //       const data = await response.json();
+  //       setModalidades(data);
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   }
+  //   fetchData();
+  // }, []);
+
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await fetch('/modalidades.json');
-        if (!response.ok) {
-          throw new Error('Erro ao carregar o arquivo JSON');
+    const fetchModalidades = async () => {
+        try {
+            const modalidades = await buscarModalidades();
+            setModalidades(modalidades);
+        } catch (error) {
+            console.log(error);
         }
-        const data = await response.json();
-        setModalidades(data);
-      } catch (error) {
-        console.error(error);
-      }
     }
-    fetchData();
-  }, []);
+    fetchModalidades();
+}, [])
 
   // Função de rolagem
   const scrollToSection = (id) => {

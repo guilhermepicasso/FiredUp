@@ -64,6 +64,28 @@ export async function listarReservasUsuario(id) {
 
 export async function criar(tabela, body) {
     try {
+        var customError = "";
+        if (tabela === "participante") {
+            // Consulta a quantidade máxima de participantes da equipe
+            const [equipe] = await con.query(`SELECT QtdMaxima FROM Equipe WHERE idEquipe = ?`, [body.idEquipe]);
+
+            if (!equipe) {
+                customError = new Error("Equipe não encontrada.");
+                customError.status = 400;
+                throw customError;
+            }
+
+            // Consulta o número atual de participantes na equipe
+            const [participantes] = await con.query(`SELECT COUNT(*) as count FROM Participante WHERE idEquipe = ?`, [body.idEquipe]);
+
+            // Verifica se a equipe já atingiu a quantidade máxima de participantes
+            if (participantes[0].count > equipe[0].QtdMaxima) {
+                customError = new Error("A quantidade máxima de participantes para esta equipe já foi atingida.");
+                customError.status = 400;
+                throw customError;
+            }
+        }
+
         var comando = `insert into ${tabela} (`;
 
         // Obter as chaves do objeto body e iterar sobre elas
@@ -91,7 +113,7 @@ export async function criar(tabela, body) {
     } catch (error) {
 
 
-        var customError = "";
+
         if (error.code === 'ER_NO_REFERENCED_ROW_2') {
             customError = new Error(`O ID do ${tabela} é inválido.`);
             customError.status = 400;
@@ -163,7 +185,7 @@ export async function alterarImagem(link, id, caminho) {
     try {
         let comando = `update ${link} set foto = "${caminho}" where id${link} = ${id};`
         console.log(comando);
-        
+
         let [resp] = await con.query(comando);
         if (resp.affectedRows === 0) {
             const error = new Error(`Resource not found: ${link} = ${id}`);
