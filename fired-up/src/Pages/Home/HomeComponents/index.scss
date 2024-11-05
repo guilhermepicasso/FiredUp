@@ -45,20 +45,19 @@ section {
   .texto {
     padding: 0 2%;
   }
+}
+.listaModalidades {
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 100%;
+  // grid-template-columns: repeat(4, 1fr);
+  // grid-auto-rows: 12vw;
+  gap: 5.7%;
+  row-gap: 2vw;
+  overflow-y: scroll;
 
-  .listaModalidades {
-    display: flex;
-    flex-wrap: wrap;
-    min-width: 100%;
-    // grid-template-columns: repeat(4, 1fr);
-    // grid-auto-rows: 12vw;
-    gap: 5.7%;
-    row-gap: 2vw;
-    overflow-y: scroll;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
+  &::-webkit-scrollbar {
+    display: none;
   }
 }
 

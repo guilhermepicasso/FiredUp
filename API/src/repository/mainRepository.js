@@ -7,8 +7,6 @@ const usuarios = [
     { RA: '445566', nome: 'CarlosSouza' }
 ];
 
-
-
 export async function listarTodos(tabela) {
     try {
         if (tabela === "usuario") {
@@ -28,8 +26,9 @@ export async function listarPorId(tabela, busca, id) {
     try {
         if (tabela === "usuario") {
             let usuario = usuarios.find(u => u.RA === id);
+            console.log(usuario);
             if (!usuario) {
-                return null;
+                return "Usuário não encontrado";
             }
             return usuario;
         } else {
@@ -106,7 +105,8 @@ export async function criar(tabela, body) {
         comando += `) values (`;
         comando += keys.map(key => `'${body[key]}'`);
         comando += `)`;
-
+        console.log(comando);
+        
         let [resp] = await con.query(comando);
         body.id = resp.insertId;
         return body;

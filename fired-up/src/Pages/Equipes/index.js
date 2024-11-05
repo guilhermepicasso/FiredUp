@@ -1,6 +1,8 @@
+import "./index.scss"
+
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { buscarEquipes, buscarModalidades, buscarParticipantes } from '../../API/chamadas';
+import { buscarEquipes, buscarModalidades } from '../../API/chamadas';
 
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
@@ -9,7 +11,7 @@ import CardModalidae from '../../Components/CardModalidade';
 
 
 export default function Equipes() {
-    const [times, setTimes] = useState([]);
+    const [equipes, setEquipes] = useState([]);
     const location = useLocation();
     const { id, img, modalidade } = location.state || {};
     const [selectedModalidade, setSelectedModalidade] = useState({
@@ -34,58 +36,56 @@ export default function Equipes() {
         }
     };
 
-    let filteredTimes = times;
+    let filteredEquipes = equipes;
 
     if (selectedModalidade.modalidade !== 'all') {
-        filteredTimes = times.filter(time =>
-            time.idModalidade === selectedModalidade.id
+        filteredEquipes = equipes.filter(equipe =>
+            equipe.idModalidade === selectedModalidade.id
         );
     }
 
     useEffect(() => {
-        const buscarTimes = async () => {
+        const busca = async () => {
             try {
-                const times = await buscarEquipes();
+                const equipes = await buscarEquipes();
                 const modalidades = await buscarModalidades();
 
                 setModalidades(modalidades);
-                setTimes(times);
-                console.log(times);
+                setEquipes(equipes);
+                console.log(equipes);
 
             } catch (error) {
                 console.log(error);
             }
         }
-        buscarTimes();
+        busca();
     }, [])
 
     return (
-
-        <div className="opcao">
-            <label>Lista de times na modalidade </label>
-            <FormControl sx={{ m: 1, minWidth: 200, height: '20px' }}>
-                <Select
-                    value={selectedModalidade.id}
-                    onChange={handleChange}
-                    displayEmpty
-                    inputProps={{ 'aria-label': 'Without label' }}
-                    sx={{ height: '30px' }}
-                >
-                    <MenuItem value="all">
-                        <em>Todos</em>
-                    </MenuItem>
-                    {modalidades.map(modalidade => (
-                        <MenuItem key={modalidade.idModalidade} value={modalidade.idModalidade}>{modalidade.Nome}</MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
-
-            <div style={{ backgroundColor: 'transparent'}} className='modalidades'>
-                <div className="listaModalidades">
-                    {filteredTimes.map(time => (
-                        <CardModalidae id={time.idEquipe} img={selectedModalidade.img} modalidade={selectedModalidade.modalidade} equipe={time}></CardModalidae>
-                    ))}
-                </div>
+        <div className="Equipes">
+            <div className="opcao">
+                <label>Lista de equipes na modalidade </label>
+                <FormControl sx={{ m: 1, minWidth: 200, height: '20px' }}>
+                    <Select
+                        value={selectedModalidade.id}
+                        onChange={handleChange}
+                        displayEmpty
+                        inputProps={{ 'aria-label': 'Without label' }}
+                        sx={{ height: '30px' }}
+                    >
+                        <MenuItem value="all">
+                            <em>Todos</em>
+                        </MenuItem>
+                        {modalidades.map(modalidade => (
+                            <MenuItem key={modalidade.idModalidade} value={modalidade.idModalidade}>{modalidade.Nome}</MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </div>
+            <div style={{padding: '0 10%'}} className="listaEquipes">
+                {filteredEquipes.map(equipe => (
+                    <CardModalidae id={equipe.idEquipe} img={selectedModalidade.img} modalidade={selectedModalidade.modalidade} equipe={equipe}></CardModalidae>
+                ))}
             </div>
         </div>
     )

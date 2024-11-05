@@ -6,20 +6,22 @@ const servidor = Router();
 const SECRET_KEY = 'your_secret_key';
 
 servidor.post('/login/', async (req, resp) => {
-    const {ra, senha} = req.body;
-    console.log(ra, senha);
-    const infoUsuario = await listarPorId("usuario", null, ra);
-    if (!infoUsuario) {
-        return resp.status(404).json({ message: 'Usuário não encontrado' });
-    }
-    if (ra === infoUsuario.RA && senha === infoUsuario.nome) {
-        const token = jwt.sign( {infoUsuario} , SECRET_KEY, { expiresIn: '1h' });
-        resp.status(200).json({ token });
+    const body = req.body;
+    const infoUsuario = await listarPorId("usuario", null, body.ra);
+    
+    // Verificação do tipo de retorno e conteúdo de infoUsuario
+    if (infoUsuario === 'Usuário não encontrado') {
+        resp.status(404).json({ message: 'Usuário inválido!' });
     } else {
-        resp.status(401).json({ message: 'Credenciais inválidas' });
+        if (infoUsuario.RA === body.senha) {
+            const token = jwt.sign({ infoUsuario }, SECRET_KEY, { expiresIn: '1h' });
+            resp.status(200).json({ token });
+            console.log("Dados do usuário retornados:", infoUsuario); 
+        } else {
+            resp.status(401).json({ message: 'Senha inválida!' });
+        }
     }
 });
-
 
 
 export default servidor;

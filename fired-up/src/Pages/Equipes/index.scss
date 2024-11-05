@@ -1,0 +1,17 @@
+.opcao{
+    display: flex;
+    // max-width: 100%;
+    align-items: baseline;
+    justify-content: center;
+    padding: 4%;
+
+    label{
+        font-size:  calc(8px + 1vw);
+    }
+}
+
+.listaEquipes{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6%;
+}

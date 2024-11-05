@@ -3,7 +3,7 @@ import express from 'express'
 import cors from 'cors'
 
 import mainController from "../src/controller/mainController.js"
-import login from "../src/controller/login.js";
+import login from "../src/controller/login.js"
 
 
 const servidor = express();
@@ -18,7 +18,7 @@ servidor.use('/storage/imagens', express.static('storage/imagens'));
 
 servidor.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).send('Erro interno do servidor');
+    res.status(505).send('Erro interno do servidor');
 });
 
 let port = process.env.PORT;
