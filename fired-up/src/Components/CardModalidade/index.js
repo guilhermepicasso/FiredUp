@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import './index.scss';
 import { toast } from 'react-toastify';
 import { useEffect, useState } from 'react';
-import { addParticipante, buscarParticipantes } from '../../API/chamadas';
+import { addParticipante, buscarParticipantes } from '../../API/chamadas.js';
 import { useAuth } from '../../Components/UserContext/AuthContext.js'; // Importar useAuth
 
 export default function CardModalidae(params) {

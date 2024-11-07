@@ -1,9 +1,11 @@
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from "../../Components/UserContext/AuthContext.js";
 import './index.scss';
 
 function Header() {
   const nomeUsuario = '';
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
 
   const voltarHome = () => {
     navigate("/");
@@ -26,10 +28,10 @@ function Header() {
         <a href="#sobre" onClick={(e) => { e.preventDefault(); scrollToSection('sobre'); }}>sobre</a>
       </div>
       <div className="login">
-        {nomeUsuario === "" ? (
-          <div className="nomeUsuario">Login</div>
+        {isAuthenticated ? (
+          <div className='nomeUsuario'>{user.nome}</div>
         ) : (
-          <div>{nomeUsuario}</div>
+          <div onClick={() => navigate('/Login')} className="botaoLogin">Login</div>
         )}
       </div>
     </header>

@@ -13,7 +13,7 @@ servidor.post('/login/', async (req, resp) => {
     if (infoUsuario === 'Usuário não encontrado') {
         resp.status(404).json({ message: 'Usuário inválido!' });
     } else {
-        if (infoUsuario.RA === body.senha) {
+        if (infoUsuario.nome === body.senha) {
             const token = jwt.sign({ infoUsuario }, SECRET_KEY, { expiresIn: '1h' });
             resp.status(200).json({ token });
             console.log("Dados do usuário retornados:", infoUsuario); 

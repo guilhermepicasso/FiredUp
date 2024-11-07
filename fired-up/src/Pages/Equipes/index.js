@@ -3,6 +3,9 @@ import "./index.scss"
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { buscarEquipes, buscarModalidades } from '../../API/chamadas';
+import { useAuth } from "../../Components/UserContext/AuthContext.js";
+import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
@@ -11,6 +14,8 @@ import CardModalidae from '../../Components/CardModalidade';
 
 
 export default function Equipes() {
+    const { isAuthenticated } = useAuth();
+    const navigate = useNavigate();
     const [equipes, setEquipes] = useState([]);
     const location = useLocation();
     const { id, img, modalidade } = location.state || {};
@@ -20,6 +25,14 @@ export default function Equipes() {
         modalidade: modalidade
     });
     const [modalidades, setModalidades] = useState([]);
+
+    const handleButtonClick = () => {
+       // if (isAuthenticated) {
+            navigate('/FormularioEquipe');
+      //  } else {
+      //     toast.info("Por favor, faça login novamente");
+      //  }
+    };
 
 
     const handleChange = (event) => {
@@ -81,8 +94,9 @@ export default function Equipes() {
                         ))}
                     </Select>
                 </FormControl>
+                <button className="botaoEquipe" onClick={handleButtonClick}>Criar Equipe</button>
             </div>
-            <div style={{padding: '0 10%'}} className="listaEquipes">
+            <div style={{ padding: '0 10%' }} className="listaEquipes">
                 {filteredEquipes.map(equipe => (
                     <CardModalidae id={equipe.idEquipe} img={selectedModalidade.img} modalidade={selectedModalidade.modalidade} equipe={equipe}></CardModalidae>
                 ))}
