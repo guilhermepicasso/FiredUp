@@ -124,22 +124,17 @@ servidor.delete('/:tabela', async (req, resp) => {
 
 // Alterar image
 servidor.put('/imagem/:tabela/:id', upload.single('imagens'), async (req, resp) => {
-    console.log("entrou na função de editar imagem");
-    
     try {
         const tabela = req.params.tabela;
         const id = req.params.id;
         let imagem = req.file.path;
-        console.log(imagem);
         let linhasAfetadas = await alterarImagem(tabela, id, imagem);
-        console.log(linhasAfetadas);
         if (linhasAfetadas == 0) {
             resp.status(404).send();
         }else{
-            resp.status(202).send();
+            resp.status(200).send();
         }
     } catch (error) {
-
         resp.status(500).json({ error: error.message });
     }
 })

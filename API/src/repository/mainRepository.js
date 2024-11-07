@@ -7,10 +7,19 @@ const usuarios = [
     { RA: '445566', nome: 'CarlosSouza' }
 ];
 
+const admin = [
+    { RA: 'admin123456', nome: 'Admin 1' },
+    { RA: 'admin654321', nome: 'Admin 2' },
+    { RA: 'admin112233', nome: 'Admin 3' },
+    { RA: 'admin445566', nome: 'Admin 4' }
+];
+
 export async function listarTodos(tabela) {
     try {
         if (tabela === "usuario") {
             return usuarios;
+        } else if (tabela === "admin") {
+            return admin;
         } else {
             let comando = `SELECT * FROM ${tabela};`
             let resp = await con.query(comando, []);
@@ -26,7 +35,12 @@ export async function listarPorId(tabela, busca, id) {
     try {
         if (tabela === "usuario") {
             let usuario = usuarios.find(u => u.RA === id);
-            console.log(usuario);
+            if (!usuario) {
+                return "Usuário não encontrado";
+            }
+            return usuario;
+        } else if (tabela === "admin") {
+            let usuario = admin.find(u => u.RA === id);
             if (!usuario) {
                 return "Usuário não encontrado";
             }
@@ -105,7 +119,6 @@ export async function criar(tabela, body) {
         comando += `) values (`;
         comando += keys.map(key => `'${body[key]}'`);
         comando += `)`;
-        console.log(comando);
         
         let [resp] = await con.query(comando);
         body.id = resp.insertId;
@@ -184,7 +197,6 @@ export async function deletarTudo(tabela) {
 export async function alterarImagem(link, id, caminho) {
     try {
         let comando = `update ${link} set foto = "${caminho}" where id${link} = ${id};`
-        console.log(comando);
 
         let [resp] = await con.query(comando);
         if (resp.affectedRows === 0) {
