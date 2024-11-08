@@ -34,7 +34,7 @@ function Login() {
                 console.log(decoded.infoUsuario);
                 toast.success("Login efetuado com Sucesso");
                 login(decoded.infoUsuario);
-                navigate('/');
+                navigate(-1);
             }
         } catch (error) {
             if (error.response && (error.response.status === 404 || error.response.status === 401)) {

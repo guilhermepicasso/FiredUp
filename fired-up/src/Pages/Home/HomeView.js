@@ -9,22 +9,6 @@ import { buscarModalidades } from "../../API/chamadas";
 function HomeView() {
   const [modalidades, setModalidades] = useState([]);
 
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     try {
-  //       const response = await fetch('/modalidades.json');
-  //       if (!response.ok) {
-  //         throw new Error('Erro ao carregar o arquivo JSON');
-  //       }
-  //       const data = await response.json();
-  //       setModalidades(data);
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   }
-  //   fetchData();
-  // }, []);
-
   useEffect(() => {
     const fetchModalidades = async () => {
         try {
