@@ -1,0 +1,58 @@
+/* Estilos do formulário de perfil */
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem; 
+  }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem; 
+  }
+  
+  @media (min-width: 640px) {
+    .form-grid {
+      grid-template-columns: repeat(2, 1fr); 
+      gap: 3rem; 
+    }
+  }
+  
+  .form-label {
+    display: block;
+    font-size: 0.875rem; 
+    color: #4a5568; 
+    margin-bottom: 0.25rem; 
+  }
+  
+  .form-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem; 
+    border: 1px solid #d2d6dc; 
+    border-radius: 0.5rem; 
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  
+  .form-input:focus {
+    border-color: #ed8936; 
+    box-shadow: 0 0 0 2px rgba(237, 137, 54, 0.3); 
+  }
+
+  .pt-4{
+    display: flex;
+    justify-content: center;
+  }
+  
+  .submit-button {
+    width: 30%;
+    background-color: #ed8936; 
+    color: #ffffff; 
+    padding: 0.5rem 1rem; 
+    border-radius: 0.5rem; 
+    transition: background-color 0.2s;
+  }
+  
+  .submit-button:hover {
+    background-color: #dd6b20; 
+  }
+  

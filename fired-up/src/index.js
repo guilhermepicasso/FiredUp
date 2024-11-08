@@ -10,6 +10,7 @@ import HomeView from './Pages/Home/HomeView';
 import Equipes from './Pages/Equipes';
 import Login from "./Pages/Login/index";
 import FormularioEquipe from './Pages/FormularioEquipe/index';
+import ProfilePage from './Pages/ProfilePage';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -21,6 +22,7 @@ root.render(
           <Route path='/Equipes' element={<Equipes />} />
           <Route path='/Login' element={<Login />} />
           <Route path='/FormularioEquipe' element={<FormularioEquipe />} />
+          <Route path='/Perfil' element={<ProfilePage />} />
         </Routes>
       </BrowserRouter>
       <ToastContainer />
