@@ -7,25 +7,21 @@ const usuarios = [
     { RA: '445566', nome: 'CarlosSouza' }
 ];
 
-export async function alterarImagem(tipo, id, caminho) {
-    try {
-        let comando = `update ${tipo} set foto = ? where id${tipo} = ?;`
-        let [resp] = await con.query(comando, [caminho, id]);
-        if (resp.affectedRows !== 1) {
-            throw new Error('Erro ao atualizar foto');
-        }
-        return resp.affectedRows;
-    } catch (error) {
-        throw error;
-    }
-}
+const admin = [
+    { RA: 'admin123456', nome: 'Admin 1' },
+    { RA: 'admin654321', nome: 'Admin 2' },
+    { RA: 'admin112233', nome: 'Admin 3' },
+    { RA: 'admin445566', nome: 'Admin 4' }
+];
 
-export async function listarTodos(tipo) {
+export async function listarTodos(tabela) {
     try {
-        if (tipo === "usuario") {
+        if (tabela === "usuario") {
             return usuarios;
+        } else if (tabela === "admin") {
+            return admin;
         } else {
-            let comando = `SELECT * FROM ${tipo};`
+            let comando = `SELECT * FROM ${tabela};`
             let resp = await con.query(comando, []);
             let linhas = resp[0];
             return linhas;
@@ -40,7 +36,13 @@ export async function listarPorId(tabela, busca, id) {
         if (tabela === "usuario") {
             let usuario = usuarios.find(u => u.RA === id);
             if (!usuario) {
-                return null;
+                return "Usuário não encontrado";
+            }
+            return usuario;
+        } else if (tabela === "admin") {
+            let usuario = admin.find(u => u.RA === id);
+            if (!usuario) {
+                return "Usuário não encontrado";
             }
             return usuario;
         } else {
@@ -73,9 +75,31 @@ export async function listarReservasUsuario(id) {
     }
 }
 
-export async function criar(tipo, body) {
+export async function criar(tabela, body) {
     try {
-        var comando = `insert into ${tipo} (`;
+        var customError = "";
+        if (tabela === "participante") {
+            // Consulta a quantidade máxima de participantes da equipe
+            const [equipe] = await con.query(`SELECT QtdMaxima FROM Equipe WHERE idEquipe = ?`, [body.idEquipe]);
+
+            if (!equipe) {
+                customError = new Error("Equipe não encontrada.");
+                customError.status = 400;
+                throw customError;
+            }
+
+            // Consulta o número atual de participantes na equipe
+            const [participantes] = await con.query(`SELECT COUNT(*) as count FROM Participante WHERE idEquipe = ?`, [body.idEquipe]);
+
+            // Verifica se a equipe já atingiu a quantidade máxima de participantes
+            if (participantes[0].count > equipe[0].QtdMaxima) {
+                customError = new Error("A quantidade máxima de participantes para esta equipe já foi atingida.");
+                customError.status = 400;
+                throw customError;
+            }
+        }
+
+        var comando = `insert into ${tabela} (`;
 
         // Obter as chaves do objeto body e iterar sobre elas
         const keys = Object.keys(body);
@@ -95,16 +119,16 @@ export async function criar(tipo, body) {
         comando += `) values (`;
         comando += keys.map(key => `'${body[key]}'`);
         comando += `)`;
-
+        
         let [resp] = await con.query(comando);
         body.id = resp.insertId;
         return body;
     } catch (error) {
 
 
-        var customError = "";
+
         if (error.code === 'ER_NO_REFERENCED_ROW_2') {
-            customError = new Error(`O ID do ${tipo} é inválido.`);
+            customError = new Error(`O ID do ${tabela} é inválido.`);
             customError.status = 400;
             throw customError;
         } else if (error.code === 'ER_DUP_ENTRY') {
@@ -116,12 +140,9 @@ export async function criar(tipo, body) {
     }
 }
 
-
-
-
-export async function alterar(tipo, id, body) {
+export async function alterar(tabela, id, body) {
     try {
-        var comando = `UPDATE ${tipo} SET `;
+        var comando = `UPDATE ${tabela} SET `;
         const keys = Object.keys(body);
         keys.forEach((key, index) => {
             comando += `${key} = '${body[key]}'`;
@@ -129,12 +150,12 @@ export async function alterar(tipo, id, body) {
                 comando += ', ';
             }
         });
-        comando += ` WHERE id${tipo} = ${id}`;
+        comando += ` WHERE id${tabela} = ${id}`;
 
         let [resp] = await con.query(comando);
 
         if (resp.affectedRows === 0) {
-            const error = new Error(`Resource not found: id${tipo} = ${id}`);
+            const error = new Error(`Resource not found: id${tabela} = ${id}`);
             error.status = 404;
             throw error;
         }
@@ -144,13 +165,13 @@ export async function alterar(tipo, id, body) {
     }
 }
 
-export async function deletarPorId(tipo, id) {
+export async function deletarPorId(tabela, id) {
     try {
-        let comando = `DELETE FROM ${tipo} WHERE id${tipo} = ${id}`
+        let comando = `DELETE FROM ${tabela} WHERE id${tabela} = ${id}`
         let [resp] = await con.query(comando);
 
         if (resp.affectedRows === 0) {
-            const error = new Error(`Resource not found: id${tipo} = ${id}`);
+            const error = new Error(`Resource not found: id${tabela} = ${id}`);
             error.status = 404;
             throw error;
         }
@@ -160,9 +181,9 @@ export async function deletarPorId(tipo, id) {
     }
 }
 
-export async function deletarTudo(tipo) {
+export async function deletarTudo(tabela) {
     try {
-        let comando = `DELETE FROM ${tipo}`;
+        let comando = `DELETE FROM ${tabela}`;
         let resp = await con.query(comando);
         if (resp[0].affectedRows === 0) {
             throw new Error('Nenhuma linha foi deletada.');
@@ -173,3 +194,18 @@ export async function deletarTudo(tipo) {
     }
 }
 
+export async function alterarImagem(link, id, caminho) {
+    try {
+        let comando = `update ${link} set foto = "${caminho}" where id${link} = ${id};`
+
+        let [resp] = await con.query(comando);
+        if (resp.affectedRows === 0) {
+            const error = new Error(`Resource not found: ${link} = ${id}`);
+            error.status = 404;
+            throw error;
+        }
+        return resp.affectedRows;
+    } catch (error) {
+        throw error;
+    }
+}

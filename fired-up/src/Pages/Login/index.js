@@ -1,44 +1,52 @@
 import './index.scss'
-// import { Link } from 'react-router-dom'
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { login } from '../../API/firedUpApi.js';
-// import { API_ADDRESS } from '../../API/constant.js';
-import { toast } from 'react-toastify'
-// import axios from 'axios';
+import { toast } from 'react-toastify';
+import { verificacaoLogin } from '../../API/chamadas.js';
+import { useAuth } from "../../Components/UserContext/AuthContext.js"
+import { jwtDecode } from "jwt-decode";
+
 
 function Login() {
     const [ra, setRa] = useState('');
-    const [nome, setNome] = useState('');
+    const [senha, setSenha] = useState('');
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const handleClick = async () => {
-        if (!ra || !nome) {
+        if (!ra || !senha) {
+            console.log('teste ')
             toast.info("Por favor, preencha todos os campos");
             return;
         }
         try {
             const corpo = {
                 ra: ra,
-                senha: nome
+                senha: senha
             };
-            const response = await login(corpo);
-            console.log("resposta retornada");
-            if (response.token) {
-                localStorage.setItem('token', response.token);
-                toast.success("Login efetuado com Sucesso")
-                console.log("Login efetuado :" + corpo);
-                navigate('/');
+            const response = await verificacaoLogin(corpo);
+            const { token } = response.data;
+            console.log(token);
+
+            if (token) {
+                localStorage.setItem('token', token);
+                const decoded = jwtDecode(token);
+                console.log(decoded.infoUsuario);
+                toast.success("Login efetuado com Sucesso");
+                login(decoded.infoUsuario);
+                navigate('/Home');
             }
         } catch (error) {
             if (error.response && (error.response.status === 404 || error.response.status === 401)) {
+                console.log(error.response.message);
                 toast.warning("Credenciais inválidas");
             } else {
                 toast.warning("Erro ao fazer o Login: " + error.message);
             }
             console.log(error.message);
         }
-    }
+    };
+
     return (
         <section className='login_page'>
             <div className='Login_container'>
@@ -62,8 +70,8 @@ function Login() {
                         <input
                             type="text"
                             id="inputName"
-                            value={nome}
-                            onChange={e => setNome(e.target.value)}
+                            value={senha}
+                            onChange={e => setSenha(e.target.value)}
                         />
                     </div>
                     <a onClick={handleClick} className="login_link">

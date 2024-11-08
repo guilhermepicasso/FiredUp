@@ -34,11 +34,15 @@ header {
     }
   }
 
-  .nomeUsuario{
+  .botaoLogin{
     font-size: 1.7vw;
     background-color: var(--laranja-principal);
     padding: 1vw 1.5vw;
     // color: white;
+  }
+  .nomeUsuario{
+    font-size: 1.7vw;
+    color: #000000;
   }
 
 }

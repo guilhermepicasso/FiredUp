@@ -1,0 +1,117 @@
+[
+    {
+        "id": 1,
+        "modalidade": "Futebol",
+        "imagem": "https://img.freepik.com/fotos-gratis/conceito-de-jogo-de-futebol_23-2151043857.jpg"
+    },
+    {
+        "id": 2,
+        "modalidade": "Vôlei",
+        "imagem": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThFq_7QGpI9MdqchSa5KMjJhgSzM-enBgrwA&s"
+    },
+    {
+        "id": 3,
+        "modalidade": "Beach tennis",
+        "imagem": "https://cdn.awsli.com.br/978/978132/arquivos/istock-1424037866.jpg"
+    },
+    {
+        "id": 4,
+        "modalidade": "Tênis",
+        "imagem": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaXEAPZUuFTHsdMLaz777VLcveAswNJ7LsHA&s"
+    },
+    {
+        "id": 5,
+        "modalidade": "Ping Pong",
+        "imagem": "https://t3.ftcdn.net/jpg/03/13/47/78/360_F_313477805_FjdtYLHA78oQBs4sYkPhVwNFDBotcCGi.jpg"
+    },
+    {
+        "id": 6,
+        "modalidade": "Futsal",
+        "imagem": "https://t3.ftcdn.net/jpg/03/08/26/80/360_F_308268080_8G5pOLMZqzfBw9xSqXGlZn8T08eYd6rb.jpg"
+    },
+    {
+        "id": 7,
+        "modalidade": "Basquete",
+        "imagem": "https://mundozumm.com.br/wp-content/uploads/2024/01/basquete-cesta.jpg"
+    },
+    {
+        "id": 8,
+        "modalidade": "Beisebol",
+        "imagem": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTVxfKBVz32B85oxptsBEabsYkBMxb_2WcA3g&s"
+    },
+    {
+        "id": 9,
+        "modalidade": "Golfe",
+        "imagem": "https://i0.wp.com/prdnetshoes.wpcomstaging.com/wp-content/uploads/2021/04/golfe_netshoes_20210323.jpeg?fit=1250%2C500&ssl=1"
+    },
+    {
+        "id": 10,
+        "modalidade": "Rugby",
+        "imagem": "https://sportlink.com.br/wp-content/uploads/2018/08/grama-sint%C3%A9tica-para-futebol-americano.jpg"
+    },
+    {
+        "id": 11,
+        "modalidade": "Futebol Americano",
+        "imagem": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQB2_wH2AssalbF7Y8KogXdrRmUsw9cMaeAeA&s"
+    },
+    {
+        "id": 12,
+        "modalidade": "Video Game",
+        "imagem": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4PL87_dSx0KQHhL7IcxQDiB_SXd1ZFuV_eA&s"
+    },
+    {
+        "id": 13,
+        "modalidade": "Natação",
+        "imagem": "https://www.amaralnatacao.com.br/wp-content/uploads/Depositphotos_9501246_m-2015-1.jpg"
+    },
+    {
+        "id": 14,
+        "modalidade": "Atletismo",
+        "imagem": "https://www.recoma.com.br/blog/wp-content/uploads/2021/02/Base-para-Pistas-de-Atletismo-Concreto-ou-Asfalto-E-tudo-igual-650x427.jpg"
+    },
+    {
+        "id": 15,
+        "modalidade": "Boxe",
+        "imagem": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSajNlSy3muqQz7CsJsM8NH6yCw673xrO1P0Q&s"
+    },
+    {
+        "id": 16,
+        "modalidade": "Handebol",
+        "imagem": "https://www.sescrio.org.br/wp-content/uploads/2019/08/GettyImages-186569077-550x330.jpg"
+    },
+    {
+        "id": 17,
+        "modalidade": "Squash",
+        "imagem": "https://rsaude.com.br/img/noticias/g/squash-23052018141715.jpg"
+    },
+    {
+        "id": 18,
+        "modalidade": "Xadrez",
+        "imagem": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Checkmate2.jpg/300px-Checkmate2.jpg"
+    },
+    {
+        "id": 19,
+        "modalidade": "Damas",
+        "imagem": "https://oimparcial.com.br/app/uploads/2019/02/damas.jpg"
+    },
+    {
+        "id": 20,
+        "modalidade": "Truco",
+        "imagem": "https://tudorondonia.com/uploads/12-10-18-zctcy96anfnvr13.jpg"
+    },
+    {
+        "id": 21,
+        "modalidade": "Poker",
+        "imagem": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ52ZQXyQNUcouUh-Snx0EvPaSdLgjBcqls_g&s"
+    },
+    {
+        "id": 22,
+        "modalidade": "Dominó",
+        "imagem": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7qthiuiHOZOgFqTq-2ydyKPMdDjBX1-XsEA&s"
+    },
+    {
+        "id": 23,
+        "modalidade": "Scrabble",
+        "imagem": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Scrabble_game_in_progress.jpg/274px-Scrabble_game_in_progress.jpg"
+    }
+]
