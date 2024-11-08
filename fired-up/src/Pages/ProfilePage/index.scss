@@ -1,0 +1,40 @@
+/* Estilos da página de perfil */
+.profile-page {
+    min-height: 100vh;
+    background-color: #ffffff; 
+    padding-top: 5rem; 
+    
+
+  }
+  .logoP {
+    width: 200px;
+    height: 200px;
+    margin-left: 8px;
+    margin-top: -80px;
+ 
+}
+
+  
+  .profile-main {
+    max-width: 42rem; 
+    margin: 0 auto;
+    padding: 2rem; 
+  }
+  
+  .profile-container {
+    background-color: #ffffff; 
+    border-radius: 1.5rem; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    padding: 1.5rem; 
+  }
+  
+  .profile-container-sm {
+    padding: 2rem; 
+  }
+  
+  .profile-heading {
+    font-size: 1.5rem; 
+    font-weight: 700; 
+    margin-bottom: 2rem; 
+  }
+  
