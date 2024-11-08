@@ -17,14 +17,12 @@ export async function buscarEquipes() {
 export async function buscaPorId(tabela, coluna, param) {
     let url = API_Adress + tabela `/${coluna}/${param}`;
     let resp = await axios.get(url);
-    console.log(resp.data);
     return resp.data;
 }
 
 export async function buscarEquipesQueParticipo(idUsuario) {
     let url = API_Adress + `participante/idUsuario/${idUsuario}`;
     let resp = await axios.get(url);
-    console.log(resp.data);
     return resp.data;
 }
 

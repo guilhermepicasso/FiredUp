@@ -36,3 +36,54 @@
     transform: rotate(360deg);
   }
 }
+
+.lista_modalidade{
+  display: flex;
+  width: 100%;
+  gap: 3vw;
+}
+.cadastro{
+  display: flex;
+  align-items: center;
+}
+
+.modalidade{
+  display: flex;
+  flex-direction: column;
+  min-width: 10%;
+  max-width: 10%;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+}
+
+.imgModalidade{
+  height: 100%;
+}
+
+.modalidade img{
+  width: 100%;
+  height: 100%;
+  object-fit:cover;
+}
+
+.modalidade p{
+  margin: 0;
+}
+
+.lista_espacos{
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2vw;
+  padding: 2vw;
+}
+
+.espaco{
+  display: flex;
+  align-items: center;
+  gap: 3vw;
+  border: 1px solid;
+  min-height: 50vh;
+}
+
+

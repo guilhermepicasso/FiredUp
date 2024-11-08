@@ -19,7 +19,6 @@ servidor.post('/:tabela', async (req, resp) => {
         }
         resp.send(resposta);
     } catch (error) {
-        console.log(error);
         const statusCode = error.status || 500;
         const errorMessage = error.message || 'Erro interno do servidor.';
         resp.status(statusCode).send({ erro: errorMessage });
