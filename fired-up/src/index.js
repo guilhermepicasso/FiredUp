@@ -21,7 +21,7 @@ root.render(
           <Route path='/Home' element={<HomeView />} />
           <Route path='/Equipes' element={<Equipes />} />
           <Route path='/Login' element={<Login />} />
-          <Route path='/FormularioEquipe' element={<FormularioEquipe />} />
+          <Route path='/criarEquipe' element={<FormularioEquipe />} />
           <Route path='/Perfil' element={<ProfilePage />} />
         </Routes>
       </BrowserRouter>

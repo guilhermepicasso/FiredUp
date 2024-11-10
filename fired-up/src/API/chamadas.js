@@ -50,3 +50,9 @@ export async function addParticipante(params) {
     let resp = await axios.post(url, body);
     return resp.data;
 }
+
+export async function criarEquipe(body) {
+    let url = API_Adress + `equipe`;
+    let resp = await axios.post(url, body);
+    return resp.data;
+  }

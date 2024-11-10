@@ -48,33 +48,33 @@
       font-size: 14px;
     }
   
-    .data-evento {
-      display: flex;
-      gap: 16px;
-      justify-content: space-between;
+    // .data-evento {
+    //   display: flex;
+    //   gap: 16px;
+    //   justify-content: space-between;
   
-      .input-icon {
-        position: relative;
-        display: flex;
-        align-items: center;
-        flex: 1;
+    //   .input-icon {
+    //     position: relative;
+    //     display: flex;
+    //     align-items: center;
+    //     flex: 1;
   
-        .icon {
-          position: absolute;
-          left: 10px;
-          font-size: 16px;
-          color: #666;
-        }
+    //     .icon {
+    //       position: absolute;
+    //       left: 10px;
+    //       font-size: 16px;
+    //       color: #666;
+    //     }
   
-        input {
-          padding-left: 24px; 
-          width: 100%;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-          font-size: 14px;
-        }
-      }
-    }
+    //     input {
+    //       padding-left: 24px; 
+    //       width: 100%;
+    //       border: 1px solid #ccc;
+    //       border-radius: 4px;
+    //       font-size: 14px;
+    //     }
+    //   }
+    // }
   
     .privacidade {
       display: flex;
