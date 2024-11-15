@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import './index.scss';
 import { toast } from 'react-toastify';
 import { useEffect, useState } from 'react';
-import { addParticipante, buscarParticipantes } from '../../API/chamadas';
+import { buscar, create } from '../../API/chamadas';
 import { useAuth } from '../../Components/UserContext/AuthContext.js'; // Importar useAuth
 
 export default function CardModalidae(params) {
@@ -16,23 +16,15 @@ export default function CardModalidae(params) {
 
     const buscarQtdParticipantes = async () => {
         try {
-            const qtdParticipantes = await buscarParticipantes();
+            const participantes_da_equipe = await buscar(`participantes/idEquipe/${params.equipe.idEquipe}`)
             
-            const countParticipantes = qtdParticipantes.filter(participante =>
-                participante.idEquipe === params.equipe.idEquipe
-            );
-            setVagasDisponiveis(params.equipe.QtdMaxima - countParticipantes.length);
+            setVagasDisponiveis(params.equipe.QtdMaxima - participantes_da_equipe.length);
         } catch (error) {
             console.log(error);
         }
     };
 
     const entrarPraEquipe = async () => {
-        // Verifica se o usuário está autenticado
-        console.log(user.RA);
-        console.log(params.equipe.idResponsavel.toString());
-        
-        
         if (!isAuthenticated) {
             toast.warning("Você precisa estar logado para entrar na equipe!");
             return;
@@ -41,7 +33,12 @@ export default function CardModalidae(params) {
             return;
         }
         try {
-            await addParticipante({ usuario: parseInt(user.RA, 10) , idEquipe: params.equipe.idEquipe });
+            const body = {
+                "idUsuario": parseInt(user.RA, 10),
+                "idEquipe": params.equipe.idEquipe,
+                "DataEntrada": new Date().toISOString()
+            };
+            await create("participante", body);
             buscarQtdParticipantes();
         } catch (error) {
             console.error("Erro ao entrar pra equipe:", error);

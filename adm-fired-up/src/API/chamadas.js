@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_Adress = 'http://192.168.15.16:5000/'
+const API_Adress = 'http://localhost:5000/'
 
 export async function verificacaoLogin(body) {
     let url = API_Adress + 'login/admin/';

@@ -2,7 +2,7 @@ import "./index.scss"
 
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { buscarEquipes, buscarModalidades } from '../../API/chamadas';
+import { buscar } from '../../API/chamadas';
 
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
@@ -47,8 +47,8 @@ export default function Equipes() {
     useEffect(() => {
         const busca = async () => {
             try {
-                const equipes = await buscarEquipes();
-                const modalidades = await buscarModalidades();
+                const equipes = await buscar('equipe');
+                const modalidades = await buscar('modalidade');
 
                 setModalidades(modalidades);
                 setEquipes(equipes);
