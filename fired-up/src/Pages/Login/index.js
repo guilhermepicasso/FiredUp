@@ -15,6 +15,7 @@ function Login() {
 
     const handleClick = async () => {
         if (!ra || !senha) {
+            console.log('teste ')
             toast.info("Por favor, preencha todos os campos");
             return;
         }
@@ -33,12 +34,11 @@ function Login() {
                 console.log(decoded.infoUsuario);
                 toast.success("Login efetuado com Sucesso");
                 login(decoded.infoUsuario);
-                navigate('/');
+                navigate(-1);
             }
         } catch (error) {
             if (error.response && (error.response.status === 404 || error.response.status === 401)) {
                 console.log(error.response.message);
-
                 toast.warning("Credenciais inválidas");
             } else {
                 toast.warning("Erro ao fazer o Login: " + error.message);
@@ -48,16 +48,15 @@ function Login() {
     };
 
     return (
-        <div className='login_page'>
+        <section className='login_page'>
             <div className='Login_container'>
                 <div className='logo'>
-                    <img  src='/Assets/images/logoFired.png' alt='Logo da FiredUp' />
+                    <img src='/Assets/images/logoFired.png' alt='Logo da FiredUp' />
                 </div>
                 <div className='LoginSlogan'>
-                    <div >
-                        <h1>Bem-vindo</h1>
-                        <span>Entre com as credenciais de acesso do Senac</span>
-                    </div>
+                    <h1>Bem-vindo</h1>
+                    <span>Entre com as credenciais de acesso do Senac</span>
+                </div>
                     <div className='inputs'>
                         <label htmlFor="inputRa">RA de Matrícula:</label>
                         <input
@@ -76,16 +75,15 @@ function Login() {
                             onChange={e => setSenha(e.target.value)}
                         />
                     </div>
-                    <button onClick={handleClick} className="login_link">
+                    <a onClick={handleClick} className="login_link">
                         <span>Entrar</span>
-                    </button>
-                </div>
+                    </a>
             </div>
             <div className='Login_banner'>
                 <h1>Centro Esportivo</h1>
                 <img className='banner' src='/Assets/images/logoBanner.png' alt='Banner Login' />
             </div>
-        </div>
+        </section>
     );
 }
 

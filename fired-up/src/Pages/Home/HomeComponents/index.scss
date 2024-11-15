@@ -38,6 +38,28 @@ section {
   color: white;
   padding: 8vw;
 
+  .header{
+    display: flex;
+    align-items: center;
+    gap: 50px;
+  }
+
+  .botaoEquipe{
+    background-color: #F78B1F;
+    color: white;
+    font-size: 24px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    display: inline-block;
+
+    &:hover {
+      background-color: darken(#F78B1F, 10%);
+    }
+  }
+
   h1 {
     color: var(--laranja-principal);
   }

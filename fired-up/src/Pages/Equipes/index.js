@@ -3,6 +3,10 @@ import "./index.scss"
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { buscar } from '../../API/chamadas';
+import { useAuth } from "../../Components/UserContext/AuthContext.js";
+import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
@@ -11,6 +15,8 @@ import CardModalidae from '../../Components/CardModalidade';
 
 
 export default function Equipes() {
+    const { isAuthenticated } = useAuth();
+    const navigate = useNavigate();
     const [equipes, setEquipes] = useState([]);
     const location = useLocation();
     const { id, img, modalidade } = location.state || {};
@@ -21,18 +27,48 @@ export default function Equipes() {
     });
     const [modalidades, setModalidades] = useState([]);
 
+    const handleButtonClick = () => {
+        if (!isAuthenticated) {
+            toast.warning(
+                <div>
+                    <div>Você precisa estar logado para criar uma equipe</div>
+                    <button
+                    style={{
+                        backgroundColor: "var(--laranja-principal)",
+                        border: "none",
+                        marginTop: '4%',
+                        padding: "2% 4%"
+                    }}
+                     onClick={() => {navigate("/Login"); toast.dismiss();}}
+                     >Fazer login</button>
+                </div>
+            )
+            return;
+        } else {
+            navigate("/FormularioEquipe");
+        }
+    };
 
     const handleChange = (event) => {
         // Filtra para encontrar a modalidade correspondente
-        const modalidade = modalidades.find(mod => mod.idModalidade === Number(event.target.value));
-
-        if (modalidade) {
-            // Atualiza todo o objeto `selectedModalidade` de uma vez
+        const value = event.target.value;
+        if (value === "all") {
+            filteredEquipes = equipes
             setSelectedModalidade({
-                id: modalidade.idModalidade,
-                modalidade: modalidade.Nome,
-                img: modalidade.Foto
+                id: 'all',
+                modalidade: 'Todos',
+                img: null
             });
+        } else {
+            const modalidade = modalidades.find(mod => mod.idModalidade === Number(value));
+
+            if (modalidade) {
+                setSelectedModalidade({
+                    id: modalidade.idModalidade,
+                    modalidade: modalidade.Nome,
+                    img: modalidade.Foto
+                });
+            }
         }
     };
 
@@ -53,6 +89,8 @@ export default function Equipes() {
                 setModalidades(modalidades);
                 setEquipes(equipes);
                 console.log(equipes);
+                
+                console.log(modalidades);
 
             } catch (error) {
                 console.log(error);
@@ -81,10 +119,14 @@ export default function Equipes() {
                         ))}
                     </Select>
                 </FormControl>
+                <button className="botaoEquipe" onClick={handleButtonClick}>Criar Equipe</button>
             </div>
-            <div style={{padding: '0 10%'}} className="listaEquipes">
+            <div style={{ padding: '0 10%' }} className="listaEquipes">
                 {filteredEquipes.map(equipe => (
-                    <CardModalidae id={equipe.idEquipe} img={selectedModalidade.img} modalidade={selectedModalidade.modalidade} equipe={equipe}></CardModalidae>
+                    // <div>{modalidades.find(m => m.idModalidade === 7)?.idModalidade} e {equipe.idModalidade}</div>
+                    <CardModalidae id={equipe.idEquipe} img={modalidades.find(modalidade =>
+                        modalidade.idModalidade === equipe.idModalidade)?.Foto} modalidade={modalidades.filter(modalidade =>
+                            equipe.idModalidade === modalidade.idModalidade)?.Nome} equipe={equipe}></CardModalidae>
                 ))}
             </div>
         </div>
