@@ -40,7 +40,7 @@ export default function UserPage() {
             }
         };
         fetchData()
-    }, [])
+    }, [user.RA])
 
     return (
         <div>
