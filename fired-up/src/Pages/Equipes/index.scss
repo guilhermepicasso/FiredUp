@@ -1,34 +1,43 @@
-.opcao{
-    display: flex;
-    // max-width: 100%;
-    align-items: baseline;
-    justify-content: center;
-    padding: 4%;
-
-    label{
-        font-size:  calc(8px + 1vw);
-    }
+.Equipes{
+    padding-bottom: 3vw;
 }
 
-.listaEquipes{
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6%;
-}
+.opcao {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  padding-bottom: 4%;
 
-.botaoEquipe{
-    background-color: var(--laranja-principal);
-    margin-left: 50px;
-    color: white;
-    font-size: 24px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-align: center;
-    display: inline-block;
-
-    &:hover {
-      background-color: darken(#F78B1F, 10%);
-    }
+  label {
+    font-size: calc(8px + 1vw);
   }
+}
+
+.listaEquipes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5.5%;
+  row-gap: 2vw;
+  overflow-y: scroll;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.botaoEquipe {
+  background-color: var(--laranja-principal);
+  margin-left: 50px;
+  color: white;
+  font-size: 24px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  display: inline-block;
+
+  &:hover {
+    background-color: darken(#f78b1f, 10%);
+  }
+}

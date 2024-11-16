@@ -40,11 +40,13 @@ servidor.get('/:tabela/:id', async (req, resp) => {
         const tabela = req.params.tabela;
         const id = req.params.id;
         const resposta = await listarReservasUsuario(id);
+        // const resposta = await listarReservasUsuario(id);
         resp.status(200).send(resposta);
     } catch (error) {
         resp.status(500).send({ erro: 'Erro interno do servidor.' });
     }
 });
+
 
 servidor.get('/:tabela/:busca/:id', async (req, resp) => {
     try {

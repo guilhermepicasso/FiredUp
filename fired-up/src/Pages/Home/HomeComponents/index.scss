@@ -10,7 +10,7 @@ section {
   h1 {
     text-transform: uppercase;
     font-weight: bold;
-    font-size: max(16px, 3vw);
+    font-size: max(16px, 2.5vw);
     margin: 0;
   }
 
@@ -18,19 +18,6 @@ section {
     font-size: max(12px, 1.5vw);
   }
 }
-
-// @media (max-width: 844px) {
-//   section {
-  
-//     h1 {
-//       font-size: 3vh;
-//     }
-  
-//     p {
-//       font-size: 12px;
-//     }
-//   }
-// }
 
 .modalidades {
   background-color: var(--preto-principal);
@@ -42,22 +29,6 @@ section {
     display: flex;
     align-items: center;
     gap: 50px;
-  }
-
-  .botaoEquipe{
-    background-color: #F78B1F;
-    color: white;
-    font-size: 24px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-align: center;
-    display: inline-block;
-
-    &:hover {
-      background-color: darken(#F78B1F, 10%);
-    }
   }
 
   h1 {
@@ -72,8 +43,6 @@ section {
   display: flex;
   flex-wrap: wrap;
   min-width: 100%;
-  // grid-template-columns: repeat(4, 1fr);
-  // grid-auto-rows: 12vw;
   gap: 5.7%;
   row-gap: 2vw;
   overflow-y: scroll;
@@ -86,7 +55,7 @@ section {
 
 .sobre {
   background-color: var(--laranja-principal);
-  padding: 8vw 2vw;
+  padding: 6vw 2vw;
   p {
     padding: 0 6vw;
   }

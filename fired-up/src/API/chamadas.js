@@ -17,5 +17,5 @@ export async function buscar(tabela) {
 export async function create(tabela, body) {
     let url = API_Adress + tabela;
     let resp = await axios.post(url, body);
-    return resp.data;
+    return resp;
 }

@@ -6,10 +6,13 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { AuthProvider } from './Components/UserContext/AuthContext';
+import UserPage from './Pages/UserPage';
+import PrivateRoute from './Components/UserContext/PrivateRoute';
 import HomeView from './Pages/Home/HomeView';
 import Equipes from './Pages/Equipes';
 import Login from "./Pages/Login/index";
 import FormularioEquipe from './Pages/FormularioEquipe/index';
+import FormularioReserva from './Pages/FormularioReserva/index2';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -21,6 +24,15 @@ root.render(
           <Route path='/Equipes' element={<Equipes />} />
           <Route path='/Login' element={<Login />} />
           <Route path='/FormularioEquipe' element={<FormularioEquipe />} />
+          <Route path='/FormularioReserva' element={<FormularioReserva />} />
+          <Route 
+            path="/UserPage" 
+            element={
+              <PrivateRoute>
+                <UserPage />
+              </PrivateRoute>
+            } 
+          />
         </Routes>
       </BrowserRouter>
       <ToastContainer />

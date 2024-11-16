@@ -16,7 +16,6 @@ servidor.post('/login/', async (req, resp) => {
         if (infoUsuario.nome === body.senha) {
             const token = jwt.sign({ infoUsuario }, SECRET_KEY, { expiresIn: '1h' });
             resp.status(200).json({ token });
-            console.log("Dados do usuário retornados:", infoUsuario); 
         } else {
             resp.status(401).json({ message: 'Senha inválida!' });
         }
@@ -34,7 +33,6 @@ servidor.post('/login/admin/', async (req, resp) => {
         if (infoUsuario.RA === body.senha) {
             const token = jwt.sign({ infoUsuario }, SECRET_KEY, { expiresIn: '1h' });
             resp.status(200).json({ token });
-            console.log("Dados do usuário retornados:", infoUsuario); 
         } else {
             resp.status(401).json({ message: 'Senha inválida!' });
         }
