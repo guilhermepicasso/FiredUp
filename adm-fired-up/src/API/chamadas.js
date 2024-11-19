@@ -14,6 +14,18 @@ export async function criar(params) {
     return resp;
 }
 
+export async function buscarId(params) {
+    let url = API_Adress + `${params.tabela}/${params.busca}/${params.id}`;
+    let resp = await axios.get(url);
+    return resp;
+}
+
+export async function deletar(params) {
+    let url = API_Adress + `${params.tabela}/${params.id}`;
+    let resp = await axios.delete(url);
+    return resp;
+}
+
 export async function alterarFotoEspaco( id, arquivoImagem) {
     let url = API_Adress + `imagem/espaco/${id}`
     const formData = new FormData();

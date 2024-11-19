@@ -18,7 +18,7 @@ root.render(
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path='/Home' element={<HomeView />} />
+          <Route path='/' element={<HomeView />} />
           <Route path='/Equipes' element={<Equipes />} />
           <Route path='/Login' element={<Login />} />
           <Route path='/criarEquipe' element={<FormularioEquipe />} />

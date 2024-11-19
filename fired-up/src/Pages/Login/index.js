@@ -34,7 +34,7 @@ function Login() {
                 console.log(decoded.infoUsuario);
                 toast.success("Login efetuado com Sucesso");
                 login(decoded.infoUsuario);
-                navigate('/Home');
+                navigate(-1);
             }
         } catch (error) {
             if (error.response && (error.response.status === 404 || error.response.status === 401)) {
@@ -50,12 +50,13 @@ function Login() {
     return (
         <section className='login_page'>
             <div className='Login_container'>
-                <img className='logo' src='/Assets/images/logoFired.png' alt='Logo da FiredUp' />
-                <div>
-                    <div className='LoginSlogan'>
-                        <h1>Bem-vindo</h1>
-                        <span>Entre com as credenciais de acesso do Senac</span>
-                    </div>
+                <div className='logo'>
+                    <img src='/Assets/images/logoFired.png' alt='Logo da FiredUp' />
+                </div>
+                <div className='LoginSlogan'>
+                    <h1>Bem-vindo</h1>
+                    <span>Entre com as credenciais de acesso do Senac</span>
+                </div>
                     <div className='inputs'>
                         <label htmlFor="inputRa">RA de Matrícula:</label>
                         <input
@@ -77,7 +78,6 @@ function Login() {
                     <a onClick={handleClick} className="login_link">
                         <span>Entrar</span>
                     </a>
-                </div>
             </div>
             <div className='Login_banner'>
                 <h1>Centro Esportivo</h1>
