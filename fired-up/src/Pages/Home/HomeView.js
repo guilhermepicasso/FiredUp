@@ -11,15 +11,15 @@ function HomeView() {
 
   useEffect(() => {
     const fetchModalidades = async () => {
-        try {
-            const modalidades = await buscarModalidades();
-            setModalidades(modalidades);
-        } catch (error) {
-            console.log(error);
-        }
+      try {
+        const modalidades = await buscarModalidades();
+        setModalidades(modalidades);
+      } catch (error) {
+        console.log(error);
+      }
     }
     fetchModalidades();
-}, [])
+  }, [])
 
   // Função de rolagem
   const scrollToSection = (id) => {

@@ -10,12 +10,12 @@ section {
   h1 {
     text-transform: uppercase;
     font-weight: bold;
-    font-size: max(16px, 3vw);
+    font-size: max(14px, 2.5vw);
     margin: 0;
   }
 
   p {
-    font-size: max(12px, 1.5vw);
+    font-size: max(12px, 1vw);
   }
 }
 
@@ -36,7 +36,7 @@ section {
   background-color: var(--preto-principal);
   height: 100%;
   color: white;
-  padding: 8vw;
+  padding: 3.5vw;
 
   .header{
     display: flex;
@@ -86,7 +86,7 @@ section {
 
 .sobre {
   background-color: var(--laranja-principal);
-  padding: 8vw 2vw;
+  padding: 4vw 2vw;
   p {
     padding: 0 6vw;
   }

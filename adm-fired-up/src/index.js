@@ -10,12 +10,21 @@ import Modalidade from './Pages/CadastroModalidade';
 import DisponibilidadeEspaco from './Pages/DisponibilidadeEspaco';
 import ModalidadeEspaco from './Pages/ModalidadeEspaco';
 
+import HomeViewADM from './Pages/HomeAdm';
+import GerenciarReservas from './Pages/GerenciarReservas';
+import GerenciarEspacos from './Pages/GerenciarEspacos';
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
       <BrowserRouter>
         <Routes>
           <Route path='/' element={<App />} />
+          
+          <Route path='/HomeViewADM' element={<HomeViewADM />} />
+          <Route path='/GerenciarReservas' element={<GerenciarReservas />} />
+          <Route path='/GerenciarEspacos' element={<GerenciarEspacos />} />
+
           <Route path='/Espaco' element={<Espaco />} />
           <Route path='/Reservas' element={<Reservas />} />
           <Route path='/Modalidade' element={<Modalidade />} />

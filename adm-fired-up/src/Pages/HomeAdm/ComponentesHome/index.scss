@@ -1,0 +1,94 @@
+section {
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    gap: 2vw;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    h1 {
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: max(14px, 2.5vw);
+        margin: 0;
+    }
+
+    p {
+        font-size: max(12px, 1vw);
+    }
+}
+
+.reservas,
+.espaco {
+    height: 100%;
+    width: 100%;
+    color: white;
+    padding: 3.5vw;
+
+    .header {
+        display: flex;
+        align-items: center;
+        gap: 50px;
+    }
+
+    .botaoReservas {
+        background-color: var(--azul-principal);
+        color: white;
+        font-size: 1vw;
+        padding: 0.5vw 1vw;
+        cursor: pointer;
+        text-align: center;
+
+        transition: transform 0.6s;
+
+        &:hover {
+            transform: scale(1.2);
+        }
+    }
+
+    .botaoEspaco {
+        background-color: var(--laranja-principal);
+        color: white;
+        font-size: 1.2vw;
+        padding: 0.8vw 1.3vw;
+        cursor: pointer;
+        text-align: center;
+        transition: transform 0.6s;
+
+        &:hover {
+            transform: scale(1.2);
+        }
+
+    }
+
+    h1 {
+        color: var(--laranja-principal);
+    }
+
+    .texto {
+        padding: 0 2%;
+    }
+}
+
+.reservas {
+    background-color: var(--preto-principal);
+}
+
+.espaco {
+    background-color: var(--azul-principal);
+}
+
+
+.listaReservaPendente {
+    display: flex;
+    flex-wrap: wrap;
+    min-width: 100%;
+    gap: 5.7%;
+    row-gap: 2vw;
+    overflow-y: scroll;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
