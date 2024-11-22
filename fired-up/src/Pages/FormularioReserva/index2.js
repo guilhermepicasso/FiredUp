@@ -1,5 +1,5 @@
 import "./index.scss";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -7,7 +7,8 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import dayjs from 'dayjs'; // Para manipulação de datas e horas
+import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
+import dayjs from 'dayjs';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -15,61 +16,196 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { buscar, create } from "../../API/chamadas";
+
+
+// Estado inicial
+const diasDaSemana = {
+  "Domingo": 0,
+  "Segunda": 1,
+  "Terça": 2,
+  "Quarta": 3,
+  "Quinta": 4,
+  "Sexta": 5,
+  "Sábado": 6
+};
 
 export default function FormularioReserva() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { equipe } = location.state || {};
-  const [espaco, setEspaco] = useState('');
+  const [espacoSelecionado, setEspacoSelecionado] = useState('');
+  const [espacos, setEspacos] = useState([]);
 
   // Estados para data e hora
+  const [horarioFuncionamento, setHorarioFuncionamento] = useState([]); // Lista de horários de funcionamento
   const [data, setData] = useState(dayjs()); // Data inicial = hoje
   const [horaInicio, setHoraInicio] = useState(dayjs().add(31, 'minute')); // Hora inicial = agora
-  const [horaFim, setHoraFim] = useState(horaInicio.add(30, 'minute')); // Hora final inicial = agora + 1 hora
+  // const [horaFim, setHoraFim] = useState(horaInicio.add(30, 'minute')); // Hora final inicial = agora + 1 hora
 
-
+  const [reservas, setReservas] = useState([]); // Lista de reservas existentes
 
   // Alterar espaço
   const handleChange = (event) => {
-    setEspaco(event.target.value);
+    setEspacoSelecionado(event.target.value);
   };
 
-  // Atualizar hora final baseada na hora inicial
-  const handleHoraInicioChange = (newHoraInicio) => {
-    setHoraInicio(newHoraInicio);
-    // Atualiza a hora final para garantir que seja válida
-    setHoraFim(newHoraInicio.add(30, 'minute')); // Atualiza hora final
-  };
-
-  // Implementar a lógica de verificação dos horarios disponiveis de acordo com a tabela HorarioFuncionamento
-  // Os dias da semana e horarios devem coincidir
-  // Pensar tbm em como combinar esta verificação com a verificação de dias e horarios onde já existem reservas realizadas
-
-  const reservar = (e) => {
+  const reservar = async (e)  =>  {
     e.preventDefault();
 
     // Validar campos
-    if (!espaco || !data || !horaInicio || !horaFim) {
+    if (!espacoSelecionado || !data || !horaInicio || !equipe) {
       toast.info("Por favor, preencha todos os campos");
       return;
     }
 
-    // Lógica de reserva
-    console.log({
-      espaco,
-      data: data.format('YYYY-MM-DD'),
-      horaInicio: horaInicio.format('HH:mm'),
-      horaFim: horaFim.format('HH:mm'),
-      equipe,
+    const body = {
+      "DataReserva": data.format('YYYY-MM-DD'),
+      "HoraInicio": horaInicio.format('HH:mm'),
+      "HoraFim": horaInicio.add(60, 'minute').format('HH:mm'),
+      "idEspaco": espacoSelecionado,
+      "idEquipe": equipe.idEquipe,
+      "status": false
+    }
+    
+    try {
+      const resp = await create("Reserva", body);      
+      if (resp.status === 200){
+        toast.success("Reserva solicitada com sucesso!");
+        navigate(-1);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Erro ao tentar realizar reserva!");
+    }
+
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await buscar('espaco')
+        setEspacos(data);
+      } catch (error) {
+        console.log("Erro ao buscar a lista de espaços");
+      }
+    }
+    fetchData();
+  }, [])
+
+  useEffect(() => {
+    const buscarDadosDeHorarios = async () => {
+      try {
+        const horarios = await buscar(`HorarioFuncionamento/idEspaco/${espacoSelecionado}`)
+        setHorarioFuncionamento(horarios)
+      } catch (error) {
+        if (error.status === 404) {
+          setHorarioFuncionamento([])
+        } else {
+          toast.error("Erro ao buscar os horários de funcionamento do espaço!")
+        }
+      }
+
+      try {
+        const reservas = await buscar(`Reserva/idEspaco/${espacoSelecionado}`)
+        setReservas(reservas)
+
+      } catch (error) {
+        if (error.status !== 404) {
+
+          toast.error("Erro ao buscar os reservas do espaço!")
+        }
+      }
+    }
+    if (espacoSelecionado !== '') {
+      buscarDadosDeHorarios()
+    }
+
+  }, [espacoSelecionado])
+
+  // Função para determinar se uma data é permitida com base nos horários de funcionamento e reservas
+  const isDiaPermitido = (date) => {
+    const diaSemana = date.day();
+    const horarioDisponivel = horarioFuncionamento.some(horario => diasDaSemana[horario.diaSemana] === diaSemana);
+    return horarioDisponivel;
+  };
+
+  // Função para determinar o horário de funcionamento para o dia selecionado
+  const getHorarioFuncionamento = (dataSelecionada) => {
+    const diaSemana = dataSelecionada.day(); // Obtém o dia da semana
+    return horarioFuncionamento.find(horario => diasDaSemana[horario.diaSemana] === diaSemana);
+  };
+
+  // Manipulador para a mudança do horário de início
+  const handleHoraInicioChange = (newHoraInicio) => {
+    const horarioFuncionamento = getHorarioFuncionamento(data);
+
+    if (horarioFuncionamento) {
+      const inicio = dayjs(horarioFuncionamento.horaInicio, 'HH:mm:ss');
+      const fim = dayjs(horarioFuncionamento.horaFim, 'HH:mm:ss');
+
+      // Verifica se o horário selecionado está dentro do horário de funcionamento
+      if (newHoraInicio.isBetween(inicio, fim, null, '[)')) {
+        setHoraInicio(newHoraInicio);
+      }
+    }
+  };
+
+  // // Manipulador para a mudança do horário de fim
+  // const handleHoraFimChange = (newHoraFim) => {
+  //   const horarioFuncionamento = getHorarioFuncionamento(data);
+
+  //   if (horarioFuncionamento) {
+  //     const inicio = dayjs(horarioFuncionamento.horaInicio, 'HH:mm:ss');
+  //     const fim = dayjs(horarioFuncionamento.horaFim, 'HH:mm:ss');
+
+  //     // Verifica se o horário selecionado está dentro do horário de funcionamento
+  //     if (
+  //       newHoraFim.isBetween(inicio, fim, null, '[)')
+  //     ) {
+  //       setHoraFim(newHoraFim);
+  //     }
+  //   }
+  // };
+
+  const formatarReserva = (reserva) => {
+    const dataReserva = new Date(reserva.DataReserva);
+    const horaInicio = new Date(dataReserva.toISOString().split('T')[0] + 'T' + reserva.HoraInicio );
+    const horaFim = new Date(dataReserva.toISOString().split('T')[0] + 'T' + reserva.HoraFim );
+
+    return {
+      horaInicio: horaInicio.toISOString(),
+      horaFim: horaFim.toISOString()
+    };
+  }
+
+  const isHorarioReservado = (dataSelecionada, hora) => {
+
+    const horario = dayjs(dataSelecionada).hour(hora.hour()).minute(hora.minute());   
+
+    const reservasNaData = reservas.filter(reserva => reserva.DataReserva.split('T')[0] === dataSelecionada.format('YYYY-MM-DD'));
+    const reservasformatadas = [];
+    reservasNaData.forEach(reserva => {
+      const format = formatarReserva(reserva);
+      reservasformatadas.push(format);
+    })
+    // Verificar se o horário cai dentro de qualquer intervalo reservado
+    return reservasformatadas.some((reserva) => {
+      const horaInicio = dayjs(reserva.horaInicio);
+      
+      const horaFim = dayjs(reserva.horaFim);
+      
+      return horario.isAfter(horaInicio) && horario.isBefore(horaFim);
     });
 
-    toast.success("Reserva solicitada com sucesso!");
-  };
+  }
+
 
   return (
     <div className="formulario_equipe">
       <div className="formulario_equipe_container">
-        <button className="close-button">✖</button>
+        <button className="close-button" onClick={() => {navigate(-1)}}>✖</button>
         <Box
           component="form"
           sx={{ '& > :not(style)': { m: 1, width: '25ch' } }}
@@ -84,58 +220,65 @@ export default function FormularioReserva() {
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={espaco}
+              value={espacoSelecionado}
               label="Espaço"
               onChange={handleChange}
               required
             >
-              <MenuItem value="Espaço 1">Espaço 1</MenuItem>
-              <MenuItem value="Espaço 2">Espaço 2</MenuItem>
-              <MenuItem value="Espaço 3">Espaço 3</MenuItem>
+              {espacos.map((espaco, key) => (
+                <MenuItem key={key} value={espaco.idEspaco}>{espaco.Nome}</MenuItem>
+              ))}
             </Select>
           </FormControl>
 
-          {espaco !== '' && (
+          {espacoSelecionado !== '' && (
             <div>
               {/* Selecionar Data */}
               <LocalizationProvider dateAdapter={AdapterDayjs}>
+                {/* Selecionar Data */}
                 <DemoContainer components={['DatePicker']}>
                   <DatePicker
                     label="Selecionar Data"
                     value={data}
                     minDate={dayjs()} // A data mínima é hoje
                     onChange={(newValue) => setData(newValue)}
+                    shouldDisableDate={(date) => !isDiaPermitido(date)} // Desativa dias não permitidos ou reservados
                   />
                 </DemoContainer>
-              </LocalizationProvider>
 
-              {/* Hora inicial */}
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                {/* Hora inicial */}
                 <DemoContainer components={['TimePicker']}>
                   <TimePicker
                     label="Hora inicial"
                     value={horaInicio}
-                    minTime={
-                      data.isSame(dayjs(), 'day') // Verifica se a data é hoje
-                        ? dayjs().add(30, 'minute') // Se for hoje, hora mínima é agora + 30 minutos
-                        : null // Se não for hoje, sem restrição
-                    }
+                    minTime={getHorarioFuncionamento(data) ? dayjs(getHorarioFuncionamento(data).horaInicio, 'HH:mm:ss') : null}
+                    maxTime={getHorarioFuncionamento(data) ? dayjs(getHorarioFuncionamento(data).horaFim, 'HH:mm:ss') : null}
                     onChange={handleHoraInicioChange}
+                    shouldDisableTime={(time) => isHorarioReservado(data, dayjs(time, 'HH:mm'))}
+                    viewRenderers={{
+                      hours: renderTimeViewClock,
+                      minutes: renderTimeViewClock,
+                      seconds: renderTimeViewClock,
+                    }}
                   />
                 </DemoContainer>
-              </LocalizationProvider>
 
-              {/* Hora final */}
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DemoContainer components={['TimePicker']}>
+                {/* Hora final */}
+                {/* <DemoContainer components={['TimePicker']}>
                   <TimePicker
                     label="Hora final"
                     value={horaFim}
-                    minTime={horaInicio.add(30, 'minute')} // Hora final mínima = hora inicial + 30 minutos
-                    maxTime={horaInicio.add(2, 'hour')} // Hora final máxima = hora inicial + 2 horas
-                    onChange={setHoraFim}
+                    minTime={horaInicio ? horaInicio.add(30, 'minute') : null} // Hora final mínima = hora inicial + 30 minutos
+                    maxTime={horaInicio ? horaInicio.add(2, 'hour') : null} // Hora final máxima = hora inicial + 2 horas
+                    onChange={handleHoraFimChange}
+                    shouldDisableTime={(time) => isHorarioReservado(data, dayjs(time, 'HH:mm'))}
+                    viewRenderers={{
+                      hours: renderTimeViewClock,
+                      minutes: renderTimeViewClock,
+                      seconds: renderTimeViewClock,
+                    }}
                   />
-                </DemoContainer>
+                </DemoContainer> */}
               </LocalizationProvider>
             </div>
           )}

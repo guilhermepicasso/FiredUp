@@ -19,3 +19,9 @@ export async function create(tabela, body) {
     let resp = await axios.post(url, body);
     return resp;
 }
+
+export async function deletar(tabela) {
+    let url = API_Adress + tabela;
+    let resp = await axios.delete(url);
+    return resp;
+}

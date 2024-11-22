@@ -1,3 +1,4 @@
+import "./index.scss";
 import { useAuth } from "../../Components/UserContext/AuthContext.js"
 import Header from "../../Components/Header/index.js"
 import { useEffect, useState } from "react"
@@ -45,12 +46,12 @@ export default function UserPage() {
     return (
         <div>
             <Header />
-            <div>
-                <p>Lista das minhas equipes</p>
+            <div className="Lista">
+                <h1>Minhas Equipes</h1>
                 <ListaEquipes array={minhasEquipes} my={true} ></ListaEquipes>
             </div>
-            <div>
-                <p>Lista das equipes que participo</p>
+            <div className="Lista">
+                <h1>Equipes que Participo</h1>
                 <ListaEquipes array={equipesParticipo} ></ListaEquipes>
             </div>
         </div>

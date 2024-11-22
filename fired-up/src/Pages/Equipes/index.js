@@ -82,7 +82,7 @@ export default function Equipes() {
             }
         };
         busca();
-    }, [modalidade]);
+    }, [modalidade, selectedModalidade]);
 
     return (
         <div className="Equipes">

@@ -8,7 +8,7 @@ export default function ListaEquipes(params) {
                     <CardEquipe equipe={equipe} my={params.my}></CardEquipe>
                 ))
             ) : (
-                <div>Você não tem nenhuma equipe criada</div>
+                <div>Não tem nenhuma equipe aqui!</div>
             )}
         </div>
     );
