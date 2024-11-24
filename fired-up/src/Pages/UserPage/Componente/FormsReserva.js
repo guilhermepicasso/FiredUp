@@ -7,8 +7,6 @@ export default function FormsReserva(params) {
         <Dialog
             open={params.open}
             onClose={params.onClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
         >
             <FormularioReserva equipe={params.equipe} onActionCompleted={params.onActionCompleted} onClose={params.onClose} />
         </Dialog>

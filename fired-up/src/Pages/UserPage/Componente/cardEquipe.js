@@ -127,6 +127,11 @@ export default function CardEquipe(params) {
                 <div className="acoes">
                     <button
                         onClick={handleReservarEspaco}
+                        disabled={status === null
+                            ? false
+                            : status
+                                ? false : true
+                        } //arrumar esse pra quando a reserva for pendente vc poder visualiza-la e quando for autorizada chamar a função de cancelar reserva
                         className={status === null
                             ? 'btn-success'
                             : status
