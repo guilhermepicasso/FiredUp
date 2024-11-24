@@ -151,6 +151,7 @@ export async function alterar(tabela, id, body) {
             }
         });
         comando += ` WHERE id${tabela} = ${id}`;
+        console.log(comando);
 
         let [resp] = await con.query(comando);
 

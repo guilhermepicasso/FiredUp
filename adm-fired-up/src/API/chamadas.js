@@ -1,12 +1,19 @@
 import axios from 'axios'
 
-const API_Adress = 'http://192.168.15.16:5000/'
+const API_Adress = 'http://localhost:5000/';
 
 export async function verificacaoLogin(body) {
     let url = API_Adress + 'login/admin/';
     let resp = await axios.post(url, body);
     return resp;
 }
+
+export async function alterar(params) {
+    let url = API_Adress + `${params.tabela}/${params.id}`;
+    let resp = await axios.put(url, params.body);
+    return resp.data;
+}
+
 
 export async function criar(params) {
     let url = API_Adress + params.tabela;
