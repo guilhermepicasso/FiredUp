@@ -16,7 +16,6 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
-import { useLocation, useNavigate } from "react-router-dom";
 import { buscar, create } from "../../API/chamadas";
 
 
@@ -31,10 +30,7 @@ const diasDaSemana = {
   "Sábado": 6
 };
 
-export default function FormularioReserva() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { equipe } = location.state || {};
+export default function FormularioReserva(params) {
   const [espacoSelecionado, setEspacoSelecionado] = useState('');
   const [espacos, setEspacos] = useState([]);
 
@@ -51,11 +47,12 @@ export default function FormularioReserva() {
     setEspacoSelecionado(event.target.value);
   };
 
-  const reservar = async (e)  =>  {
+  const reservar = async (e) => {
     e.preventDefault();
-
+    console.log("Equipe que veio: ", params.equipe);
+    
     // Validar campos
-    if (!espacoSelecionado || !data || !horaInicio || !equipe) {
+    if (!espacoSelecionado || !data || !horaInicio || !params.equipe) {
       toast.info("Por favor, preencha todos os campos");
       return;
     }
@@ -65,24 +62,25 @@ export default function FormularioReserva() {
       "HoraInicio": horaInicio.format('HH:mm'),
       "HoraFim": horaInicio.add(60, 'minute').format('HH:mm'),
       "idEspaco": espacoSelecionado,
-      "idEquipe": equipe.idEquipe,
+      "idEquipe": params.equipe.idEquipe,
       "status": false
     }
-    
+
     try {
-      const resp = await create("Reserva", body);      
-      if (resp.status === 200){
+      const resp = await create("Reserva", body);
+      if (resp.status === 200) {
         toast.success("Reserva solicitada com sucesso!");
-        navigate(-1);
       }
     } catch (error) {
       console.log(error);
       toast.error("Erro ao tentar realizar reserva!");
     }
-
+    params.onClose();
+    params.onActionCompleted();
   };
 
   useEffect(() => {
+    
     const fetchData = async () => {
       try {
         const data = await buscar('espaco')
@@ -171,8 +169,8 @@ export default function FormularioReserva() {
 
   const formatarReserva = (reserva) => {
     const dataReserva = new Date(reserva.DataReserva);
-    const horaInicio = new Date(dataReserva.toISOString().split('T')[0] + 'T' + reserva.HoraInicio );
-    const horaFim = new Date(dataReserva.toISOString().split('T')[0] + 'T' + reserva.HoraFim );
+    const horaInicio = new Date(dataReserva.toISOString().split('T')[0] + 'T' + reserva.HoraInicio);
+    const horaFim = new Date(dataReserva.toISOString().split('T')[0] + 'T' + reserva.HoraFim);
 
     return {
       horaInicio: horaInicio.toISOString(),
@@ -182,7 +180,7 @@ export default function FormularioReserva() {
 
   const isHorarioReservado = (dataSelecionada, hora) => {
 
-    const horario = dayjs(dataSelecionada).hour(hora.hour()).minute(hora.minute());   
+    const horario = dayjs(dataSelecionada).hour(hora.hour()).minute(hora.minute());
 
     const reservasNaData = reservas.filter(reserva => reserva.DataReserva.split('T')[0] === dataSelecionada.format('YYYY-MM-DD'));
     const reservasformatadas = [];
@@ -193,9 +191,9 @@ export default function FormularioReserva() {
     // Verificar se o horário cai dentro de qualquer intervalo reservado
     return reservasformatadas.some((reserva) => {
       const horaInicio = dayjs(reserva.horaInicio);
-      
+
       const horaFim = dayjs(reserva.horaFim);
-      
+
       return horario.isAfter(horaInicio) && horario.isBefore(horaFim);
     });
 
@@ -203,68 +201,65 @@ export default function FormularioReserva() {
 
 
   return (
-    <div className="formulario_equipe">
-      <div className="formulario_equipe_container">
-        <button className="close-button" onClick={() => {navigate(-1)}}>✖</button>
-        <Box
-          component="form"
-          sx={{ '& > :not(style)': { m: 1, width: '25ch' } }}
-          noValidate
-          autoComplete="off"
-          onSubmit={reservar}
+    <Box
+      className="formulario_equipe_container"
+      component="form"
+      sx={{ '& > :not(style)': { m: 1, width: '25ch' } }}
+      noValidate
+      autoComplete="off"
+      onSubmit={reservar}
+    >
+      <h1>Solicitar Reserva</h1>
+
+      <FormControl fullWidth>
+        <InputLabel id="demo-simple-select-label" required>Espaço</InputLabel>
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          value={espacoSelecionado}
+          label="Espaço"
+          onChange={handleChange}
+          required
         >
-          <h1>Solicitar Reserva</h1>
+          {espacos.map((espaco, key) => (
+            <MenuItem key={key} value={espaco.idEspaco}>{espaco.Nome}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
 
-          <FormControl fullWidth>
-            <InputLabel id="demo-simple-select-label" required>Espaço</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={espacoSelecionado}
-              label="Espaço"
-              onChange={handleChange}
-              required
-            >
-              {espacos.map((espaco, key) => (
-                <MenuItem key={key} value={espaco.idEspaco}>{espaco.Nome}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+      {espacoSelecionado !== '' && (
+        <div>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            {/* Selecionar Data */}
+            <DemoContainer components={['DatePicker']}>
+              <DatePicker
+                label="Selecionar Data"
+                value={data}
+                minDate={dayjs()} // A data mínima é hoje
+                onChange={(newValue) => setData(newValue)}
+                shouldDisableDate={(date) => !isDiaPermitido(date)} // Desativa dias não permitidos ou reservados
+              />
+            </DemoContainer>
 
-          {espacoSelecionado !== '' && (
-            <div>
-              {/* Selecionar Data */}
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                {/* Selecionar Data */}
-                <DemoContainer components={['DatePicker']}>
-                  <DatePicker
-                    label="Selecionar Data"
-                    value={data}
-                    minDate={dayjs()} // A data mínima é hoje
-                    onChange={(newValue) => setData(newValue)}
-                    shouldDisableDate={(date) => !isDiaPermitido(date)} // Desativa dias não permitidos ou reservados
-                  />
-                </DemoContainer>
+            {/* Hora inicial */}
+            <DemoContainer components={['TimePicker']}>
+              <TimePicker
+                label="Hora inicial"
+                value={horaInicio}
+                minTime={getHorarioFuncionamento(data) ? dayjs(getHorarioFuncionamento(data).horaInicio, 'HH:mm:ss') : null}
+                maxTime={getHorarioFuncionamento(data) ? dayjs(getHorarioFuncionamento(data).horaFim, 'HH:mm:ss') : null}
+                onChange={handleHoraInicioChange}
+                shouldDisableTime={(time) => isHorarioReservado(data, dayjs(time, 'HH:mm'))}
+                viewRenderers={{
+                  hours: renderTimeViewClock,
+                  minutes: renderTimeViewClock,
+                  seconds: renderTimeViewClock,
+                }}
+              />
+            </DemoContainer>
 
-                {/* Hora inicial */}
-                <DemoContainer components={['TimePicker']}>
-                  <TimePicker
-                    label="Hora inicial"
-                    value={horaInicio}
-                    minTime={getHorarioFuncionamento(data) ? dayjs(getHorarioFuncionamento(data).horaInicio, 'HH:mm:ss') : null}
-                    maxTime={getHorarioFuncionamento(data) ? dayjs(getHorarioFuncionamento(data).horaFim, 'HH:mm:ss') : null}
-                    onChange={handleHoraInicioChange}
-                    shouldDisableTime={(time) => isHorarioReservado(data, dayjs(time, 'HH:mm'))}
-                    viewRenderers={{
-                      hours: renderTimeViewClock,
-                      minutes: renderTimeViewClock,
-                      seconds: renderTimeViewClock,
-                    }}
-                  />
-                </DemoContainer>
-
-                {/* Hora final */}
-                {/* <DemoContainer components={['TimePicker']}>
+            {/* Hora final */}
+            {/* <DemoContainer components={['TimePicker']}>
                   <TimePicker
                     label="Hora final"
                     value={horaFim}
@@ -279,17 +274,15 @@ export default function FormularioReserva() {
                     }}
                   />
                 </DemoContainer> */}
-              </LocalizationProvider>
-            </div>
-          )}
+          </LocalizationProvider>
+        </div>
+      )}
 
-          <Stack direction="row" spacing={2}>
-            <Button variant="contained" onClick={reservar}>
-              Reservar Espaço
-            </Button>
-          </Stack>
-        </Box>
-      </div>
-    </div>
+      <Stack direction="row" spacing={2}>
+        <Button variant="contained" onClick={reservar}>
+          Reservar Espaço
+        </Button>
+      </Stack>
+    </Box>
   );
 }

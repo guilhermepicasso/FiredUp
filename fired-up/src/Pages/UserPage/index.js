@@ -10,49 +10,62 @@ export default function UserPage() {
     const [minhasEquipes, setMinhasEquipes] = useState([])
     const [equipesParticipo, setEquipesParticipo] = useState([])
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const minhas_equipes = await buscar(`equipe/idResponsavel/${user.RA}`);
-                setMinhasEquipes(minhas_equipes);
-            } catch (error) {
-                if (error.status !== 404) {
-                    console.error('Erro ao buscar minhas equipes:', error);
-                }
+    const fetchMinhasEquipes = async () => {
+        try {
+            const minhas_equipes = await buscar(`equipe/idResponsavel/${user.RA}`);
+            setMinhasEquipes(minhas_equipes.filter(equipe => equipe !== null));
+        } catch (error) {
+            if (error.status !== 404) {
+                console.error('Erro ao buscar minhas equipes:', error);
+            } else {
+                setMinhasEquipes([]);
             }
+        }
+    };
 
-            try {
-                const equipes_que_participo = await buscar(`participante/idUsuario/${user.RA}`);
-                const infoEquipes = await Promise.all(
-                    equipes_que_participo.map(async (id) => {
-                        try {
-                            const equipe = await buscar(`equipe/idEquipe/${id.idEquipe}`);
-                            return equipe[0];
-                        } catch (error) {
-                            console.error("Erro ao buscar equipe:", error);
-                            return null;
+    const fetchEquipesQueParticipo = async () => {
+        try {
+            const equipes_que_participo = await buscar(`participante/idUsuario/${user.RA}`);
+            const infoEquipes = await Promise.all(
+                equipes_que_participo.map(async (participante) => {
+                    try {
+                        const equipe = await buscar(`equipe/idEquipe/${participante.idEquipe}`);
+                        if (equipe[0]) {
+                            return { ...equipe[0], idParticipante: participante.idParticipante };
                         }
-                    })
-                );
-
-                setEquipesParticipo(infoEquipes.filter(equipe => equipe !== null));
-            } catch (error) {
+                        return null;
+                    } catch (error) {
+                        console.error("Erro ao buscar equipe:", error);
+                        return null;
+                    }
+                })
+            );
+            setEquipesParticipo(infoEquipes.filter(equipe => equipe !== null));
+        } catch (error) {
+            if (error.status !== 404) {
                 console.error('Erro ao buscar equipes que participo:', error);
+            } else{
+                setEquipesParticipo([]);
             }
-        };
-        fetchData()
-    }, [user.RA])
+        }
+    };
+
+    useEffect(() => {
+        fetchEquipesQueParticipo();
+        fetchMinhasEquipes();
+    }, [user.RA]);
+
 
     return (
         <div>
             <Header />
             <div className="Lista">
                 <h1>Minhas Equipes</h1>
-                <ListaEquipes array={minhasEquipes} my={true} ></ListaEquipes>
+                <ListaEquipes array={minhasEquipes} my={true}  onDataChanged={fetchMinhasEquipes} />
             </div>
             <div className="Lista">
                 <h1>Equipes que Participo</h1>
-                <ListaEquipes array={equipesParticipo} ></ListaEquipes>
+                <ListaEquipes array={equipesParticipo} onDataChanged={fetchEquipesQueParticipo}/>
             </div>
         </div>
     )

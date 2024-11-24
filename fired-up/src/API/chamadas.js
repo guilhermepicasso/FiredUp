@@ -23,5 +23,7 @@ export async function create(tabela, body) {
 export async function deletar(tabela) {
     let url = API_Adress + tabela;
     let resp = await axios.delete(url);
+    console.log(url);
+    console.log(resp);
     return resp;
 }
