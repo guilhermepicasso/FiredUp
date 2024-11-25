@@ -15,8 +15,7 @@ import ModalidadeEspaco from './Pages/ModalidadeEspaco';
 import HomeViewADM from './Pages/HomeAdm';
 import GerenciarReservas from './Pages/GerenciarReservas';
 import GerenciarEspacos from './Pages/GerenciarEspacos';
-
-import Teste from './Pages/Teste';
+import PDFViewer from './components/Footer/PDFViewer';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -24,9 +23,7 @@ root.render(
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<App />} />
-        <Route path='/teste' element={<Teste />} />
-
-
+        <Route path='/TermoDeUso' element={<PDFViewer />} />
         <Route path='/HomeViewADM' element={<HomeViewADM />} />
         <Route path='/GerenciarReservas' element={<GerenciarReservas />} />
         <Route path='/GerenciarEspacos' element={<GerenciarEspacos />} />

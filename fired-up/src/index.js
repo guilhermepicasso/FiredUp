@@ -11,6 +11,8 @@ import Equipes from './Pages/Equipes';
 import Login from "./Pages/Login/index";
 import FormularioEquipe from './Pages/FormularioEquipe/index';
 import ProfilePage from './Pages/ProfilePage';
+import PDFViewer from './Components/Footer/PDFViewer';
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -19,6 +21,7 @@ root.render(
       <BrowserRouter>
         <Routes>
           <Route path='/' element={<HomeView />} />
+          <Route path='/TermoDeUso' element={<PDFViewer />} />
           <Route path='/Equipes' element={<Equipes />} />
           <Route path='/Login' element={<Login />} />
           <Route path='/criarEquipe' element={<FormularioEquipe />} />

@@ -15,7 +15,14 @@
     margin: 0;
   }
 
-  .footerChildren {
+  a{
+    color: var(--preto-principal);
+    font-weight: bold;
+    text-decoration: none; 
+    color: inherit; 
+  }
+
+  .footerChildren{
     display: flex;
     flex-direction: column;
     align-items: center;
