@@ -60,7 +60,7 @@ function LoginADM() {
                 <div className='inputs'>
                     <label htmlFor="inputRa">RA de Matrícula:</label>
                     <input
-                        type="number"
+                        type="text"
                         id="inputRa"
                         value={ra}
                         onChange={e => setRa(e.target.value)}
