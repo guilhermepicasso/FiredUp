@@ -4,6 +4,7 @@ import Header from "../../Components/Header/index.js"
 import { useEffect, useState } from "react"
 import { buscar } from "../../API/chamadas.js"
 import ListaEquipes from "./Componente/listaEquipes.js"
+import Footer from "../../Components/Footer/index.js";
 
 export default function UserPage() {
     const { user } = useAuth()
@@ -44,7 +45,7 @@ export default function UserPage() {
         } catch (error) {
             if (error.status !== 404) {
                 console.error('Erro ao buscar equipes que participo:', error);
-            } else{
+            } else {
                 setEquipesParticipo([]);
             }
         }
@@ -61,12 +62,13 @@ export default function UserPage() {
             <Header />
             <div className="Lista">
                 <h1>Minhas Equipes</h1>
-                <ListaEquipes array={minhasEquipes} my={true}  onDataChanged={fetchMinhasEquipes} />
+                <ListaEquipes array={minhasEquipes} my={true} onDataChanged={fetchMinhasEquipes} />
             </div>
             <div className="Lista">
                 <h1>Equipes que Participo</h1>
-                <ListaEquipes array={equipesParticipo} onDataChanged={fetchEquipesQueParticipo}/>
+                <ListaEquipes array={equipesParticipo} onDataChanged={fetchEquipesQueParticipo} />
             </div>
+            <Footer />
         </div>
     )
 }

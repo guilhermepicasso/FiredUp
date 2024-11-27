@@ -33,7 +33,12 @@ export default function FormularioEquipe() {
   }
 
   const handleToggle = () => {
-    setPrivacidade((prev) => !prev);
+    if (privacidade) {
+setPrivacidade(false);
+    } else {
+      setPrivacidade(true);
+    }
+
   };
 
   const handleForms = async (e) => {
@@ -44,7 +49,7 @@ export default function FormularioEquipe() {
     }
     const body = {
       "NomeEquipe": nomeEquipe,
-      "isPublica": privacidade,
+      "isPublica": !privacidade,
       "idResponsavel": user.RA,
       "QtdMaxima": qtdParticipantes,
       "idModalidade": modalidade.idModalidade

@@ -116,7 +116,7 @@ export default function CardEquipe(params) {
                 </div>
                 <p>{modalidades.find(modalidade => modalidade.idModalidade === equipe.idModalidade)?.Nome}</p>
             </div>
-            <div>Equipe: {equipe.NomeEquipe}</div>
+            <div>{equipe.NomeEquipe}</div>
             <div className="extraContent">
                 <p>Qtd jogadores até o momento</p>
                 <h1>{equipe.QtdMaxima}</h1>
