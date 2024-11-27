@@ -8,45 +8,24 @@ export async function verificacaoLogin(body) {
     return resp;
 }
 
-export async function buscarEquipes() {
-    let url = API_Adress + `equipe`;
+export async function buscar(tabela) {
+    let url = API_Adress + tabela;
     let resp = await axios.get(url);
     return resp.data;
 }
 
-export async function buscaPorId(tabela, coluna, param) {
-    let url = API_Adress + tabela `/${coluna}/${param}`;
-    let resp = await axios.get(url);
-    return resp.data;
-}
-
-export async function buscarEquipesQueParticipo(idUsuario) {
-    let url = API_Adress + `participante/idUsuario/${idUsuario}`;
-    let resp = await axios.get(url);
-    return resp.data;
-}
-
-export async function buscarModalidades() {
-    let url = API_Adress + `modalidade`;
-    let resp = await axios.get(url);
-    return resp.data;
-}
-
-export async function buscarParticipantes() {
-    let url = API_Adress + `participante`;
-    let resp = await axios.get(url);
-    return resp.data;
-}
-
-export async function addParticipante(params) {
-    let url = API_Adress + `participante`;
-    const body = {
-        "idUsuario": params.usuario,
-        "idEquipe": params.idEquipe,
-        "DataEntrada": new Date().toISOString()
-    };
+export async function create(tabela, body) {
+    let url = API_Adress + tabela;
     let resp = await axios.post(url, body);
-    return resp.data;
+    return resp;
+}
+
+export async function deletar(tabela) {
+    let url = API_Adress + tabela;
+    let resp = await axios.delete(url);
+    console.log(url);
+    console.log(resp);
+    return resp;
 }
 
 export async function criarEquipe(body) {

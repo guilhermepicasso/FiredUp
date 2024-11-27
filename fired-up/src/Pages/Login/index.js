@@ -75,9 +75,9 @@ function Login() {
                             onChange={e => setSenha(e.target.value)}
                         />
                     </div>
-                    <a onClick={handleClick} className="login_link">
+                    <div onClick={handleClick} className="login_link">
                         <span>Entrar</span>
-                    </a>
+                    </div>
             </div>
             <div className='Login_banner'>
                 <h1>Centro Esportivo</h1>

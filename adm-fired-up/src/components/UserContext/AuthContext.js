@@ -3,7 +3,7 @@ import { buscar } from '../../API/chamadas';
 
 const AuthContext = createContext();
 
-const EXPIRATION_TIME = 30 * 60 * 1000; // 30 minutos em milissegundos
+const EXPIRATION_TIME = 60 * 60 * 1000; // 1 hora em milissegundos
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);

@@ -1,119 +1,41 @@
-.nova-equipe-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-
-  background-color: var(--backcolor);
-
-  .nova-equipe {
-    background-color: #ffffff;
-    padding: 4vw;
-    width: 30vw;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 17px;
-    position: relative;
-    text-align: center;
-  }
-
-  .close-button {
-    position: absolute;
-    top: 1vh;
-    right: 1vh;
-    background: none;
-    border: none;
-    font-size: 15px;
-    cursor: pointer;
-    transition: transform 0.3s ease; 
-  }
-
-  .close-button:hover {
-    transform: scale(1.1); 
-  }
-
-  h2 {
-    margin-bottom: 4vh;
-    font-size: 24px;
-    font-weight: bold;
-  }
-
-  label {
-    display: block;
-    margin: 10px 0 10px;
-    font-weight: bold;
-    font-size: 15px;
-  }
-
-  input,
-  select {
-    width: 100%;
-    padding: 0.25vw;
-    margin-bottom: 10px;
-    border: 1px solid var(--cinza);
-    border-radius: 4px;
-    font-size: 15px;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease; 
-
-    &:focus {
-      border-color: var(--laranja-principal); 
-      box-shadow: 0 0 5px var(--laranja-principal); 
-    }
-  }
-
-  .privacidade {
+.formulario_equipe{
     display: flex;
-    gap: 14px;
+    align-items: center;
     justify-content: center;
-    margin: 16px 0 16px;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgb(220, 220, 220);
 
-    button {
-      padding: 0.3vw;
-      border: none;
-      font-size: 15px;
-      cursor: pointer;
-      width: 5vw;
-      border-radius: 4px;
-      transition: background-color 0.3s ease, transform 0.3s ease; 
 
-      &:hover {
-        transform: scale(1.05); 
-      }
+    .formulario_equipe_container{
+        display: flex;
+        flex-direction: column;
+        align-items: end;
+        background-color: white;
+        padding: 2vw;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+
+        .close-button{
+            border: none;
+            background-color: transparent;
+            width: fit-content;
+            font-size: 1.5vw;
+            margin: 0;
+        }
+
+        form{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+
+            .text_field{
+                display: flex;
+                width: 100%;
+                gap: 2vw;
+                
+            }
+        }
     }
-
-    .public {
-      background-color: var(--cinza);
-      color: var(--cinza-escuro);
-    }
-
-    .private {
-      background-color: var(--cinza);
-      color: var(--cinza-escuro);
-    }
-
-    .active {
-      background-color: var(--laranja-principal);
-      color: #ffffff;
-    }
-  }
-
-  .register-button {
-    background-color: var(--preto-principal);
-    color: #ffffff;
-    padding: 0.4vw;
-    width: 100%;
-    border: none;
-    border-radius: 4px;
-    font-size: 15px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-
-    &:hover {
-      background-color: var(--laranja-principal); 
-      transform: scale(1.05); 
-    }
-  }
 }
-
-
-
-

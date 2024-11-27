@@ -2,37 +2,32 @@ import { useNavigate } from 'react-router-dom';
 import './index.scss';
 import { toast } from 'react-toastify';
 import { useEffect, useState } from 'react';
-import { addParticipante, buscarParticipantes } from '../../API/chamadas.js';
-import { useAuth } from '../../Components/UserContext/AuthContext.js'; // Importar useAuth
+import { buscar, create } from '../../API/chamadas';
+import { useAuth } from '../../Components/UserContext/AuthContext.js';
 
 export default function CardModalidae(params) {
     const navigate = useNavigate();
     const [vagasDisponiveis, setVagasDisponiveis] = useState(0);
-    const { user, isAuthenticated } = useAuth(); // Acesse o estado de autenticação
+    const { user, isAuthenticated } = useAuth();
 
-    const handleNavigation = (id, img, modalidade) => {
-        navigate('/Equipes', { state: { id, img, modalidade } });
+    const handleNavigation = (modalidade) => {
+        navigate('/Equipes', { state: { modalidade } });
     };
 
     const buscarQtdParticipantes = async () => {
         try {
-            const qtdParticipantes = await buscarParticipantes();
-            
-            const countParticipantes = qtdParticipantes.filter(participante =>
-                participante.idEquipe === params.equipe.idEquipe
-            );
-            setVagasDisponiveis(params.equipe.QtdMaxima - countParticipantes.length);
+            const participantes_da_equipe = await buscar(`participante/idEquipe/${params.equipe.idEquipe}`)   
+            setVagasDisponiveis(params.equipe.QtdMaxima - 1 - participantes_da_equipe.length);
         } catch (error) {
-            console.log(error);
+            if (error.status === 404) {
+                setVagasDisponiveis(params.equipe.QtdMaxima - 1)
+            } else {
+                toast.warning(error.status)
+            }
         }
     };
 
     const entrarPraEquipe = async () => {
-        // Verifica se o usuário está autenticado
-        console.log(user.RA);
-        console.log(params.equipe.idResponsavel.toString());
-        
-        
         if (!isAuthenticated) {
             toast.warning("Você precisa estar logado para entrar na equipe!");
             return;
@@ -41,10 +36,20 @@ export default function CardModalidae(params) {
             return;
         }
         try {
-            await addParticipante({ usuario: parseInt(user.RA, 10) , idEquipe: params.equipe.idEquipe });
+            const body = {
+                "idUsuario": parseInt(user.RA, 10),
+                "idEquipe": params.equipe.idEquipe,
+                "DataEntrada": new Date().toISOString()
+            };
+            await create("participante", body);
+            toast.success(`Agora você participa da equipe de ${params.modalidade.Nome}`);
             buscarQtdParticipantes();
         } catch (error) {
-            console.error("Erro ao entrar pra equipe:", error);
+            if (error.status === 401) {
+                toast.error("Você já faz parte desta equipe!")
+            } else {
+                console.error("Erro ao entrar pra equipe:", error);
+            }
         }
     };
 
@@ -55,9 +60,9 @@ export default function CardModalidae(params) {
     }, [params.equipe]);
 
     return (
-        <div className="cardModalidade" onClick={() => handleNavigation(params.id, params.img, params.modalidade)} key={params.id}>
-            <img src={params.img} alt={`Modalidade ${params.modalidade}`} />
-            <p>{params.modalidade}</p>
+        <div className="cardModalidade" onClick={() => handleNavigation(params.modalidade)} key={params.modalidade.idModalidade}>
+            <img src={params.modalidade.Foto} alt={`Modalidade ${params.modalidade.Nome}`} />
+            <p>{params.modalidade.Nome}</p>
             {params.equipe ? (
                 <div className="extraContent">
                     <p>Qtd jogadores até o momento</p>
@@ -65,10 +70,10 @@ export default function CardModalidae(params) {
                     <p>Qtd de vagas disponível</p>
                     <h1>{vagasDisponiveis}</h1>
                     <button 
-                        style={{ opacity: vagasDisponiveis === 0 ? 0.5 : 1 }}
-                        disabled={vagasDisponiveis === 0} 
+                        style={{ opacity: vagasDisponiveis <= 0 ? 0.5 : 1 }}
+                        disabled={vagasDisponiveis <= 0} 
                         onClick={() => entrarPraEquipe()}
-                    > {vagasDisponiveis === 0 ? "Equipe completa" : "Entrar pra equipe"}</button>
+                    > {vagasDisponiveis <= 0 ? "Equipe completa" : "Entrar pra equipe"}</button>
                 </div>
             ) : null}
         </div>

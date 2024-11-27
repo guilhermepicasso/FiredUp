@@ -8,10 +8,11 @@ const usuarios = [
 ];
 
 const admin = [
-    { RA: 'admin123456', nome: 'Admin 1' },
-    { RA: 'admin654321', nome: 'Admin 2' },
-    { RA: 'admin112233', nome: 'Admin 3' },
-    { RA: 'admin445566', nome: 'Admin 4' }
+    { RA: '223344', nome: 'Admin 1' },
+    { RA: '556677', nome: 'Admin 2' },
+    { RA: '778899', nome: 'Admin 3' },
+    { RA: '990011', nome: 'Admin 4' }
+
 ];
 
 export async function listarTodos(tabela) {
@@ -85,7 +86,7 @@ async function verificarHorarioExistente(idEspaco, diaSemana, horaInicio, horaFi
             horaFim <= ? OR horaInicio >= ?
         )
     `;
-    
+
     const [result] = await con.query(query, [idEspaco, diaSemana, horaInicio, horaFim]);
     const teste = result[0].count >= 1
     return teste; // Retorna true se já existir um horário igual
@@ -123,8 +124,8 @@ export async function criar(tabela, body) {
                 customError.status = 400;
                 throw customError;
             }
-            
-            const verificacao = await verificarHorarioExistente(body.idEspaco, body.diaSemana, body.horaInicio, body.horaFim)            
+
+            const verificacao = await verificarHorarioExistente(body.idEspaco, body.diaSemana, body.horaInicio, body.horaFim)
             if (verificacao) {
                 customError = new Error(`Horario de funcionamento ja cadastrado!`);
                 customError.status = 400;

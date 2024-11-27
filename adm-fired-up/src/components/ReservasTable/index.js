@@ -2,6 +2,9 @@ import './index.scss';
 import { buscar, buscarId, alterar, deletar } from '../../API/chamadas';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useAuth } from "../UserContext/AuthContext.js";
+import { confirmAlert } from 'react-confirm-alert'; 
+import 'react-confirm-alert/src/react-confirm-alert.css';
 import { toast } from 'react-toastify';
 
 
@@ -9,6 +12,7 @@ function ReservasTable(params) {
   const [reservas, setReservas] = useState([]);
   const [espacos, setEspacos] = useState([]);
   const [equipes, setEquipes] = useState([]);
+  const { user } = useAuth();
   const location = useLocation();
 
   useEffect(() => {
@@ -37,22 +41,45 @@ function ReservasTable(params) {
   }, [location.pathname]); 
 
   const handleExcluir = (id) => {
-    deletar({ tabela: 'Reserva', id })
-      .then(() => {
-        toast.success('Reserva excluída com sucesso!');
-        setReservas((prevReservas) => prevReservas.filter((res) => res.idReserva !== id));
-      })
-      .catch((error) => {
-        toast.error(`Erro ao excluir a reserva: ${error}`);
-      });
+    confirmAlert({
+      title: 'Confirmar exclusão',
+      message: 'Você tem certeza que deseja excluir esta reserva?',
+      buttons: [
+        {
+          label: 'Sim',
+          onClick: () => {
+            deletar({ tabela: 'Reserva', id })
+              .then(() => {
+                toast.success('Reserva excluída com sucesso!');
+                setReservas((prevReservas) => prevReservas.filter((res) => res.idReserva !== id));
+              })
+              .catch((error) => {
+                toast.error(`Erro ao excluir a reserva: ${error}`);
+              });
+          }
+        },
+        {
+          label: 'Não',
+          onClick: () => {
+            toast.info('Exclusão cancelada');
+          }
+        }
+      ]
+    });
   };
 
-  const handleStatus = (id) => {
+  const handleStatus = (id,RA) => {
     const reserva = reservas.find((res) => res.idReserva === id);
+    console.log(Number(RA));
   
     if (reserva) {
       const newStatus = reserva.status ? 0 : 1;
-      alterar({ tabela: 'Reserva', id, body: { status: newStatus } })
+      const body = { 
+        status: newStatus, 
+        idAdmResponsavel: Number(RA)
+      }; 
+  
+      alterar({ tabela: 'Reserva', id, body }) 
         .then(() => {
           toast.success(`Reserva ${newStatus ? 'autorizada' : 'vetada'} com sucesso!`);
           setReservas((prevReservas) => {
@@ -70,7 +97,7 @@ function ReservasTable(params) {
         });
     }
   };
-
+  
   const getEspacoNome = (idEspaco) => {
     const espaco = espacos.find((esp) => esp.idEspaco === idEspaco);
     return espaco ? espaco.Nome : 'Espaço desconhecido';
@@ -80,6 +107,11 @@ function ReservasTable(params) {
     const equipe = equipes.find((eq) => eq.idEquipe === idEquipe);
     return equipe ? equipe.NomeEquipe : 'Individual';
   };
+
+  const getEquipeResponsavel = (idEquipe) =>{
+    const equipe = equipes.find((eq)=> eq.idEquipe == idEquipe);
+    return equipe ? equipe.idResponsavel:'Invalido';
+  }
 
   return (
     <div className='ComponenteReservaAdm'>
@@ -92,6 +124,7 @@ function ReservasTable(params) {
             <th>Hora Início</th>
             <th>Espaço</th>
             <th>Equipe</th>
+            <th>RA Responsável</th>
             <th>Ações</th>
           </tr>
         </thead>
@@ -113,8 +146,9 @@ function ReservasTable(params) {
               <td>{reserva.HoraInicio}</td>
               <td>{getEspacoNome(reserva.idEspaco)}</td>
               <td>{getEquipeNome(reserva.idEquipe)}</td>
+              <td>{getEquipeResponsavel(reserva.idEquipe)}</td>
               <td>
-                <button className={`botao ${reserva.status ? 'vetar' : 'autorizar'}`} onClick={() => handleStatus(reserva.idReserva)}>{reserva.status ? 'Vetar' : 'Autorizar'}</button>
+                <button className={`botao ${reserva.status ? 'vetar' : 'autorizar'}`} onClick={() => handleStatus(reserva.idReserva, user.RA)}>{reserva.status ? 'Vetar' : 'Autorizar'}</button>
                 <button className='botao excluir' onClick={() => handleExcluir(reserva.idReserva)}>Excluir</button>
               </td>
             </tr>
