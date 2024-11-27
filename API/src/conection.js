@@ -7,7 +7,7 @@ try {
   con = await mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'Picasso7788@',
+    password: '',
     database: 'FiredUp'
   });
   console.log('Conexão com BD realizada');
