@@ -8,14 +8,17 @@ export default function Footer() {
         { titulos: ["Unidades", "Instituição", "Termos", "Redes Sociais"] },
         {
             dados: [
-                "São Paulo",
-                "Senac",
-                { link: "/TermoDeUso" },
+                "São Paulo", // Unidades
+                "Senac", // Instituição
+                [
+                    { nome: "Termos de Uso", link: "/TermoDeUso" }, // Primeiro termo
+                    { nome: "Termo de Privacidade", link: "/TermoDePrivacidade" } // Segundo termo
+                ],
                 {
                     info: [
-                        { icone: <InstagramIcon className='icon'/>, link: "https://www.instagram.com/senacsaopaulo" },
-                        { icone: <FacebookIcon className='icon'/>, link: "https://www.facebook.com/senacsaopaulo" },
-                        { icone: <LinkedInIcon className='icon'/>, link: "https://www.linkedin.com/company/senac/" }
+                        { icone: <InstagramIcon className='icon' />, link: "https://www.instagram.com/senacsaopaulo" },
+                        { icone: <FacebookIcon className='icon' />, link: "https://www.facebook.com/senacsaopaulo" },
+                        { icone: <LinkedInIcon className='icon' />, link: "https://www.linkedin.com/company/senac/" }
                     ]
                 }
             ]
@@ -28,12 +31,16 @@ export default function Footer() {
                 <div key={index} className='footerChildren'>
                     <h1>{titulo}</h1>
                     {index === 0 ? (
-                        <h2 className='info'> {teste[1].dados[0]}</h2> // Exibe "São Paulo"
+                        <h2 className='info'> {teste[1].dados[0]}</h2> 
                     ) : index === 1 ? (
-                        <h2 className='info'> {teste[1].dados[1]}</h2> // Exibe "Senac"
+                        <h2 className='info'> {teste[1].dados[1]}</h2> 
                     ) : index === 2 ? (
                         <div className='info'>
-                            <a href={teste[1].dados[2].link}>Termos de Uso</a> {/* Link para a página de termos */}
+                            {teste[1].dados[2].map((termo, i) => ( 
+                                <a key={i} href={termo.link} className='termoLink'>
+                                    {termo.nome}
+                                </a>
+                            ))}
                         </div>
                     ) : (
                         <div className='info'>
@@ -49,4 +56,3 @@ export default function Footer() {
         </footer>
     );
 }
-

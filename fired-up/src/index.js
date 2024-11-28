@@ -13,8 +13,8 @@ import Equipes from './Pages/Equipes';
 import Login from "./Pages/Login/index";
 import FormularioEquipe from './Pages/FormularioEquipe/index';
 import ProfilePage from './Pages/ProfilePage';
-import PDFViewer from './Components/Footer/PDFViewer';
-
+import TermoDeUso from './Components/Footer/TermoDeUso';
+import TermoDePrivacidade from './Components/Footer/TermoDePrivacidade';
 import FormularioReserva from './Pages/FormularioReserva/index2';
 import App from "./Pages/FormularioReserva/teste";
 
@@ -25,7 +25,8 @@ root.render(
       <BrowserRouter>
         <Routes>
           <Route path='/' element={<HomeView />} />
-          <Route path='/TermoDeUso' element={<PDFViewer />} />
+          <Route path='/TermoDeUso' element={<TermoDeUso />} />
+          <Route path='/TermoDePrivacidade' element={<TermoDePrivacidade />} />
           <Route path='/Equipes' element={<Equipes />} />
           <Route path='/Login' element={<Login />} />
           <Route path='/FormularioEquipe' element={<FormularioEquipe />} />

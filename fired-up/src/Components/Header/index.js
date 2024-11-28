@@ -25,7 +25,6 @@ function Header() {
       {location.pathname === '/' && (
         <div className="sessoes">
           <a href="#modalidades" onClick={(e) => { e.preventDefault(); scrollToSection('modalidades'); }}>Modalidades</a>
-          <a href="#meuTime" onClick={(e) => { e.preventDefault(); scrollToSection('meuTime'); }}>meu time</a>
           <a href="#sobre" onClick={(e) => { e.preventDefault(); scrollToSection('sobre'); }}>sobre</a>
         </div>
       )}

@@ -17,7 +17,8 @@ import ModalidadeEspaco from './Pages/ModalidadeEspaco';
 import HomeViewADM from './Pages/HomeAdm';
 import GerenciarReservas from './Pages/GerenciarReservas';
 import GerenciarEspacos from './Pages/GerenciarEspacos';
-import PDFViewer from './components/Footer/PDFViewer';
+import TermoDeUso from './components/Footer/TermoDeUso';
+import TermoDePrivacidade from './components/Footer/TermoDePrivacidade';
 import LoginADM from './Pages/LoginADM';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -28,7 +29,8 @@ root.render(
         <Routes>
           <Route path='/' element={<LoginADM />} />
           <Route path='/App' element={<App />} />
-          <Route path='/TermoDeUso' element={<PDFViewer />} />
+          <Route path='/TermoDeUso' element={<TermoDeUso />} />
+          <Route path='/TermoDePrivacidade' element={<TermoDePrivacidade />} />
           <Route path='/HomeViewADM' element={<HomeViewADM />} />
           <Route path='/GerenciarReservas' element={<GerenciarReservas />} />
           <Route path='/GerenciarEspacos' element={<GerenciarEspacos />} />
