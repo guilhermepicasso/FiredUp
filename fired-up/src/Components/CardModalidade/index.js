@@ -39,7 +39,7 @@ export default function CardModalidae(params) {
             const body = {
                 "idUsuario": parseInt(user.RA, 10),
                 "idEquipe": params.equipe.idEquipe,
-                "DataEntrada": new Date().toISOString()
+                "DataEntrada": new Date().toISOString().split('T')[0]
             };
             await create("participante", body);
             toast.success(`Agora você participa da equipe de ${params.modalidade.Nome}`);
