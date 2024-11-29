@@ -28,6 +28,7 @@
       p{
         margin: 0;
     }
+    
   }
 
   .extraContent{
@@ -74,4 +75,14 @@
     flex-direction: column;
     gap: 2vw;
     padding-bottom: 2vw;
+
+    .reserva{
+      .titulo{
+        text-align: center;
+        font-weight: bold;
+      }
+      p{
+        margin: 0;
+      }
+    }
 }

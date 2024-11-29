@@ -1,5 +1,4 @@
 import "./index.scss";
-import { useNavigate } from "react-router-dom";
 import PropTypes from 'prop-types'; // Para validação das props
 import { useAuth } from "../../../Components/UserContext/AuthContext";
 import { useState, useEffect } from "react"; // Adicione o useEffect aqui
@@ -10,11 +9,10 @@ import AlertDialog from "./AlertDialog";
 import FormsReserva from "./FormsReserva";
 
 export default function CardEquipe(params) {
-    const navigate = useNavigate();
     const { modalidades } = useAuth();
     const { equipe, my } = params;
     const [vagasDisponiveis, setVagasDisponiveis] = useState(0);
-    const [status, setStatus] = useState(null);
+    const [dadosReserva, setDadosReserva] = useState({});
     const [open, setOpen] = useState(false);
     const [openForms, setOpenForms] = useState(false);
     const [description, setDescription] = useState(false);
@@ -26,26 +24,37 @@ export default function CardEquipe(params) {
         try {
             if (equipe) {
                 const participantes_da_equipe = await buscar(`participante/idEquipe/${equipe.idEquipe}`);
-                setVagasDisponiveis(equipe.QtdMaxima - 1 - participantes_da_equipe.length);
+                const vagas = equipe.QtdMaxima - 1 - participantes_da_equipe.length;
+                if (vagas !== vagasDisponiveis) {  // Só atualiza se o valor mudou
+                    setVagasDisponiveis(vagas);
+                }
             }
         } catch (error) {
             if (error.status === 404) {
-                setVagasDisponiveis(equipe.QtdMaxima - 1);
+                const vagas = equipe.QtdMaxima - 1;
+                if (vagas !== vagasDisponiveis) {
+                    setVagasDisponiveis(vagas);
+                }
             } else {
                 toast.warning(error.status);
             }
         }
     };
+    
 
     const buscarReservaEquipe = async () => {
         try {
             const reservaEquipe = await buscar(`reserva/idEquipe/${equipe.idEquipe}`);
             if (reservaEquipe) {
-                setStatus(reservaEquipe[0].status);
+                setDadosReserva(reservaEquipe[0]);
             }
+            console.log("ok em buscarReservaEquipe");
         } catch (error) {
             if (error.status === 404) {
-                setStatus(null);
+                setDadosReserva({
+                    ...dadosReserva,
+                    status: null
+                });
             } else {
                 toast.warning(error.status);
             }
@@ -54,11 +63,11 @@ export default function CardEquipe(params) {
 
     // useEffect para buscar o número de participantes quando o componente for montado
     useEffect(() => {
-        if (equipe) {
+        if (equipe && !dadosReserva.status) {  // Verifica se o status não foi carregado
             buscarQtdParticipantes();
             buscarReservaEquipe();
         }
-    }, [equipe]);
+    }, [equipe, dadosReserva.status]);
 
     // Verifica se a equipe foi passada corretamente
     if (!equipe) {
@@ -66,11 +75,13 @@ export default function CardEquipe(params) {
     }
 
     const handleReservarEspaco = () => {
-        // Envia os dados da equipe para o formulário de reserva
-        // navigate('/FormularioReserva', { state: { equipe } });
         setOpenForms(true)
     };
 
+    const converterData = (data) => {
+        const newDate = new Date(data);
+        return newDate.toLocaleDateString('pt-BR');
+    }
 
     const handleClickOpen = (type) => {
         if (type === "sair_equipe") {
@@ -79,6 +90,9 @@ export default function CardEquipe(params) {
         } else if (type === "deletar_equipe") {
             setDescription("\n Deseja realmente deletar esta equipe?")
             setType("Deletar Equipe")
+        } else if (type === "cancelar_reserva") {
+            setDescription("\n Deseja realmente cancelar esta reserva?")
+            setType("Cancelar Reserva")
         }
         setOpen(true);
     };
@@ -94,6 +108,7 @@ export default function CardEquipe(params) {
     return (
         <div className="card_equipe" key={equipe.idEquipe}>
             <FormsReserva
+                reserva={dadosReserva.status !== null ? dadosReserva : null}
                 equipe={equipe}
                 open={openForms}
                 onClose={handleCloseForms}
@@ -104,7 +119,7 @@ export default function CardEquipe(params) {
                 description={description}
                 button={type}
                 onClose={handleClose}
-                id={type === "Sair da Equipe" ? equipe.idParticipante : equipe.idEquipe}
+                id={type === "Sair da Equipe" ? equipe.idParticipante : type === "Deletar Equipe" ? equipe.idEquipe : dadosReserva.idReserva}
                 onActionCompleted={params.onDataChanged}
             />
             <div className="modalidade">
@@ -116,7 +131,17 @@ export default function CardEquipe(params) {
                 </div>
                 <p>{modalidades.find(modalidade => modalidade.idModalidade === equipe.idModalidade)?.Nome}</p>
             </div>
-            <div>{equipe.NomeEquipe}</div>
+            <div>
+                <p>{equipe.NomeEquipe}</p>
+                {dadosReserva.status === 1 &&
+                    <div className="reserva">
+                        <p className="titulo">Dados da reserva</p>
+                        <p>Espaço: {dadosReserva.idEspaco}</p>
+                        <p>Dia: {converterData(dadosReserva.DataReserva)}</p>
+                        <p>Inicio: {dadosReserva.HoraInicio.slice(0, 5)}</p>
+                    </div>
+                }
+            </div>
             <div className="extraContent">
                 <p>Qtd jogadores até o momento</p>
                 <h1>{equipe.QtdMaxima}</h1>
@@ -126,22 +151,17 @@ export default function CardEquipe(params) {
             {my ? (
                 <div className="acoes">
                     <button
-                        onClick={handleReservarEspaco}
-                        disabled={status === null
-                            ? false
-                            : status
-                                ? false : true
-                        } //arrumar esse pra quando a reserva for pendente vc poder visualiza-la e quando for autorizada chamar a função de cancelar reserva
-                        className={status === null
+                        onClick={() => dadosReserva.status !== null && dadosReserva.status ? handleClickOpen("cancelar_reserva") : handleReservarEspaco()}
+                        className={dadosReserva.status === null
                             ? 'btn-success'
-                            : status
+                            : dadosReserva.status
                                 ? 'btn-cancel'
                                 : 'btn-pend'
                         }
                     >
-                        {status === null
+                        {dadosReserva.status === null
                             ? 'Reservar espaço'
-                            : status
+                            : dadosReserva.status
                                 ? 'Cancelar Reserva'
                                 : 'Reserva pendente'
                         }
@@ -150,7 +170,6 @@ export default function CardEquipe(params) {
                 </div>
             ) : (
                 <div className="acoes">
-                    {/* Pensar em como buscar aqui o idParticipante deste vinculo equipe usuario */}
                     <button className='btn-cancel' onClick={() => handleClickOpen("sair_equipe")}>Sair da equipe</button>
                 </div>
             )}

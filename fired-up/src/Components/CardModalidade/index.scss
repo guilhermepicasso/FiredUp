@@ -10,6 +10,8 @@
   min-width: 20%;
   max-width: 20%;
 
+
+
   img {
     width: 100%;
     height: 100%;
@@ -20,17 +22,17 @@
     color: var(--preto-principal);
     text-transform: uppercase;
     font-weight: bold;
-    font-size: 1.7vw;
+    font-size: calc(2px + 1em);
   }
 
   .extraContent{
     p{
-      font-size: 0.8vw;
+      font-size: calc(4px + 0.5vw);
       margin: 0;
     }
     h1{
       margin: 0;
-      font-size: 1.7vw;
+      font-size: calc(7px + 1vw);
     }
 
     button{
@@ -41,6 +43,14 @@
       color: var(--preto-principal);
       font-weight: bold;
       font-size: 1.2vw;
+      font-size: calc(5px + 1vw);
+      cursor: pointer; 
     }
+  }
+}
+@media (max-width: 600px) {
+  .equipeExistente {
+    min-width: 180px;
+    max-width: 180px;
   }
 }

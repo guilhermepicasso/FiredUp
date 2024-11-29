@@ -65,10 +65,13 @@ export default function Equipes() {
             try {
                 const equipes = await buscar('equipe');
                 const modalidades = await buscar('modalidade');
-
-                setModalidades(modalidades);
+    
+                // Ordena as modalidades antes de definir no estado
+                const modalidadesOrdenadas = modalidades.sort((a, b) => a.Nome.localeCompare(b.Nome));
+    
+                setModalidades(modalidadesOrdenadas); // Atualiza o estado com modalidades ordenadas
                 setEquipes(equipes);
-
+    
                 if (selectedModalidade === "all") {
                     setFilteredEquipes(equipes);
                 } else {
@@ -81,21 +84,26 @@ export default function Equipes() {
                 toast.error(error);
             }
         };
+    
         busca();
-    }, [modalidade, selectedModalidade]);
+    }, [selectedModalidade]);  
 
     return (
         <div className="Equipes">
             <Header />
             <div className="opcao">
                 <label>Lista de equipes na modalidade </label>
-                <FormControl sx={{ m: 1, minWidth: 200, height: '20px' }}>
+                <FormControl sx={{ m: 1, minWidth: 'calc(180px + 3vw)',height: 'calc(15px + 2vw)' }}>
                     <Select
                         value={selectedModalidade}
                         onChange={handleChange}
                         displayEmpty
                         inputProps={{ 'aria-label': 'Without label' }}
-                        sx={{ height: '30px' }}
+                        sx={{
+                            height: '100%', 
+                            width: '100%',
+                            fontSize: { xs: '16px', sm: '18px', md: '20px', lg: '22px' }, // Responsividade do texto
+                        }}
                     >
                         <MenuItem value="all">
                             <em>Todos</em>

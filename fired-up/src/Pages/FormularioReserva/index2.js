@@ -16,7 +16,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
-import { buscar, create } from "../../API/chamadas";
+import { buscar, create, edit } from "../../API/chamadas";
 
 
 // Estado inicial
@@ -31,6 +31,7 @@ const diasDaSemana = {
 };
 
 export default function FormularioReserva(params) {
+  const [editar, setEditar] = useState(false);
   const [espacoSelecionado, setEspacoSelecionado] = useState('');
   const [espacos, setEspacos] = useState([]);
 
@@ -48,31 +49,39 @@ export default function FormularioReserva(params) {
   };
 
   const reservar = async (e) => {
-    e.preventDefault();
-    console.log("Equipe que veio: ", params.equipe);
-    
+    e.preventDefault();    
     // Validar campos
     if (!espacoSelecionado || !data || !horaInicio || !params.equipe) {
       toast.info("Por favor, preencha todos os campos");
       return;
     }
 
-    const body = {
-      "DataReserva": data.format('YYYY-MM-DD'),
-      "HoraInicio": horaInicio.format('HH:mm'),
-      "HoraFim": horaInicio.add(60, 'minute').format('HH:mm'),
-      "idEspaco": espacoSelecionado,
-      "idEquipe": params.equipe.idEquipe,
-      "status": false
-    }
-
     try {
-      const resp = await create("Reserva", body);
+      let resp = {}
+      if (editar) {
+        const body = {
+          "DataReserva": data.format('YYYY-MM-DD'),
+          "HoraInicio": horaInicio.format('HH:mm'),
+          "HoraFim": horaInicio.add(60, 'minute').format('HH:mm'),
+          "idEspaco": espacoSelecionado,
+          "status": false
+        }
+        resp = await edit(`Reserva/${params.reserva.idReserva}`, body);
+      } else {
+        const body = {
+          "DataReserva": data.format('YYYY-MM-DD'),
+          "HoraInicio": horaInicio.format('HH:mm'),
+          "HoraFim": horaInicio.add(60, 'minute').format('HH:mm'),
+          "idEspaco": espacoSelecionado,
+          "idEquipe": params.equipe.idEquipe,
+          "status": false
+        }
+        resp = await create("Reserva", body);
+      }
       if (resp.status === 200) {
         toast.success("Reserva solicitada com sucesso!");
       }
     } catch (error) {
-      console.log(error);
       toast.error("Erro ao tentar realizar reserva!");
     }
     params.onClose();
@@ -80,7 +89,6 @@ export default function FormularioReserva(params) {
   };
 
   useEffect(() => {
-    
     const fetchData = async () => {
       try {
         const data = await buscar('espaco')
@@ -88,6 +96,13 @@ export default function FormularioReserva(params) {
       } catch (error) {
         console.log("Erro ao buscar a lista de espaços");
       }
+    }
+    if (params.reserva) {
+      setEspacoSelecionado(params.reserva.idEspaco);
+      const horaReserva = dayjs(params.reserva.HoraInicio, 'HH:mm:ss')
+      setHoraInicio(horaReserva);
+      const date = dayjs(params.reserva.DataReserva);
+      setData(date);
     }
     fetchData();
   }, [])
@@ -196,9 +211,7 @@ export default function FormularioReserva(params) {
 
       return horario.isAfter(horaInicio) && horario.isBefore(horaFim);
     });
-
   }
-
 
   return (
     <Box
@@ -212,8 +225,9 @@ export default function FormularioReserva(params) {
       <h1>Solicitar Reserva</h1>
 
       <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label" required>Espaço</InputLabel>
+        <InputLabel id="demo-simple-select-label" required>{params.equipe.idEquipe}Espaço</InputLabel>
         <Select
+          disabled={!editar}
           labelId="demo-simple-select-label"
           id="demo-simple-select"
           value={espacoSelecionado}
@@ -233,6 +247,7 @@ export default function FormularioReserva(params) {
             {/* Selecionar Data */}
             <DemoContainer components={['DatePicker']}>
               <DatePicker
+                disabled={!editar}
                 label="Selecionar Data"
                 value={data}
                 minDate={dayjs()} // A data mínima é hoje
@@ -244,6 +259,7 @@ export default function FormularioReserva(params) {
             {/* Hora inicial */}
             <DemoContainer components={['TimePicker']}>
               <TimePicker
+                disabled={!editar}
                 label="Hora inicial"
                 value={horaInicio}
                 minTime={getHorarioFuncionamento(data) ? dayjs(getHorarioFuncionamento(data).horaInicio, 'HH:mm:ss') : null}
@@ -279,8 +295,8 @@ export default function FormularioReserva(params) {
       )}
 
       <Stack direction="row" spacing={2}>
-        <Button variant="contained" onClick={reservar}>
-          Reservar Espaço
+        <Button variant="contained" onClick={(e) => (!editar ? setEditar(true) : reservar(e))}>
+          {params.reserva && !editar ? 'Alterar Reserva' : "Reservar Espaço"}
         </Button>
       </Stack>
     </Box>

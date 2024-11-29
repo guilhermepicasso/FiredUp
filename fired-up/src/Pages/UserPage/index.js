@@ -15,6 +15,8 @@ export default function UserPage() {
         try {
             const minhas_equipes = await buscar(`equipe/idResponsavel/${user.RA}`);
             setMinhasEquipes(minhas_equipes.filter(equipe => equipe !== null));
+            console.log("ok na fetchMinhasEquipes");
+            
         } catch (error) {
             if (error.status !== 404) {
                 console.error('Erro ao buscar minhas equipes:', error);
@@ -42,6 +44,7 @@ export default function UserPage() {
                 })
             );
             setEquipesParticipo(infoEquipes.filter(equipe => equipe !== null));
+            console.log("ok na fetchEquipesQueParticipo");
         } catch (error) {
             if (error.status !== 404) {
                 console.error('Erro ao buscar equipes que participo:', error);
@@ -52,8 +55,10 @@ export default function UserPage() {
     };
 
     useEffect(() => {
-        fetchEquipesQueParticipo();
-        fetchMinhasEquipes();
+        if (user.RA) {  // Verifique se `user.RA` está disponível antes de fazer as requisições
+            fetchEquipesQueParticipo();
+            fetchMinhasEquipes();
+        }
     }, [user.RA]);
 
 

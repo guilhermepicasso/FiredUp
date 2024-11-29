@@ -15,7 +15,6 @@ function LoginADM() {
 
     const handleClick = async () => {
         if (!ra || !senha) {
-            console.log('teste ')
             toast.info("Por favor, preencha todos os campos");
             return;
         }
@@ -26,24 +25,19 @@ function LoginADM() {
             };
             const response = await verificacaoLogin(corpo);
             const { token } = response.data;
-            console.log(token);
-
             if (token) {
                 localStorage.setItem('token', token);
                 const decoded = jwtDecode(token);
-                console.log(decoded.infoUsuario);
                 toast.success("Login efetuado com Sucesso");
                 login(decoded.infoUsuario);
                 navigate('/HomeViewADM');
             }
         } catch (error) {
             if (error.response && (error.response.status === 404 || error.response.status === 401)) {
-                console.log(error.response.message);
                 toast.warning("Credenciais inválidas");
             } else {
                 toast.warning("Erro ao fazer o Login: " + error.message);
             }
-            console.log(error.message);
         }
     };
 

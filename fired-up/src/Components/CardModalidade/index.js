@@ -16,7 +16,7 @@ export default function CardModalidae(params) {
 
     const buscarQtdParticipantes = async () => {
         try {
-            const participantes_da_equipe = await buscar(`participante/idEquipe/${params.equipe.idEquipe}`)   
+            const participantes_da_equipe = await buscar(`participante/idEquipe/${params.equipe.idEquipe}`)
             setVagasDisponiveis(params.equipe.QtdMaxima - 1 - participantes_da_equipe.length);
         } catch (error) {
             if (error.status === 404) {
@@ -60,18 +60,27 @@ export default function CardModalidae(params) {
     }, [params.equipe]);
 
     return (
-        <div className="cardModalidade" onClick={() => handleNavigation(params.modalidade)} key={params.modalidade.idModalidade}>
+        <div
+            className={`cardModalidade ${params.equipe && 'equipeExistente'}`}
+            onClick={() => handleNavigation(params.modalidade)}
+            key={params.modalidade.idModalidade}
+            style={{ cursor: params.equipe ? 'default' : 'pointer' }}
+        >
             <img src={params.modalidade.Foto} alt={`Modalidade ${params.modalidade.Nome}`} />
-            <p>{params.modalidade.Nome}</p>
+            {params.equipe ? 
+                <p>{params.equipe.NomeEquipe}</p>
+             :
+                <p>{params.modalidade.Nome}</p>
+            }
             {params.equipe ? (
                 <div className="extraContent">
                     <p>Qtd jogadores até o momento</p>
                     <h1>{params.equipe.QtdMaxima}</h1>
                     <p>Qtd de vagas disponível</p>
                     <h1>{vagasDisponiveis}</h1>
-                    <button 
+                    <button
                         style={{ opacity: vagasDisponiveis <= 0 ? 0.5 : 1 }}
-                        disabled={vagasDisponiveis <= 0} 
+                        disabled={vagasDisponiveis <= 0}
                         onClick={() => entrarPraEquipe()}
                     > {vagasDisponiveis <= 0 ? "Equipe completa" : "Entrar pra equipe"}</button>
                 </div>

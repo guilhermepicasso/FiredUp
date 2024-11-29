@@ -10,23 +10,27 @@ import { deletar } from '../../../API/chamadas';
 
 export default function AlertDialog(params) {
 
-  const deletarEquipe = async () => {
+  const deletarDados = async () => {
     try {
-      await deletar(`equipe/${params.id}`);
-      toast.success("Deletou a equipe");
-    } catch (error) {
-      toast.error("Erro ao tentar deletar equipe");
-    }
-    params.onClose();
-    params.onActionCompleted();
-  }
+      if (params.button === "Sair da Equipe") {
+        console.log("Tentando sair da equipe", params.id);
+        
+        await deletar(`Participante/${params.id}`);
+        toast.success("Você saiu da equipe!");
 
-  const sairDaEquipe = async () => {
-    try {
-      await deletar(`participante/${params.id}`);
-      toast.success("Saiu da equipe");
+      } else if (params.button === "Deletar Equipe") {
+        console.log("Tentando deletar a equipe", params.id);
+        await deletar(`Equipe/${params.id}`);
+        toast.success("Equipe deletada com sucesso!");
+      } else {
+        console.log("Tentando excluir reserva", params.id);
+        await deletar(`Reserva/${params.id}`);
+        toast.success("Reserva cancelada com sucesso!");
+      }
     } catch (error) {
-      toast.error("Erro ao tentar deletar equipe");      
+      toast.error("Erro ao tentar executar ação!");
+      console.log(error);
+      
     }
     params.onClose();
     params.onActionCompleted();
@@ -40,7 +44,11 @@ export default function AlertDialog(params) {
       aria-describedby="alert-dialog-description"
     >
       <DialogTitle id="alert-dialog-title">
-        {params.button === "Sair da Equipe" ? "Deseja realmente sair desta equipe?" : "Deseja realmente excluir esta equipe?"}
+        {params.button === "Sair da Equipe" ? 
+        "Deseja realmente sair desta equipe?" :
+        params.button === "Deletar Equipe" ? 
+        "Deseja realmente deletar esta equipe?" : 
+        "Deseja realmente excluir esta reserva?"}
       </DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
@@ -50,8 +58,8 @@ export default function AlertDialog(params) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={params.onClose}>Cancelar</Button>
-        <Button onClick={() => (params.button === "Sair da Equipe" ? sairDaEquipe() : deletarEquipe())} autoFocus>
+        <Button onClick={() => (params.onClose)}>Cancelar</Button>
+        <Button onClick={() => (deletarDados())} autoFocus>
           {params.button}
         </Button>
       </DialogActions>

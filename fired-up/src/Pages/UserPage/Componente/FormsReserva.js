@@ -8,7 +8,12 @@ export default function FormsReserva(params) {
             open={params.open}
             onClose={params.onClose}
         >
-            <FormularioReserva equipe={params.equipe} onActionCompleted={params.onActionCompleted} onClose={params.onClose} />
+            <FormularioReserva
+                reserva={params.reserva ? params.reserva : null}
+                equipe={params.equipe}
+                onActionCompleted={params.onActionCompleted}
+                onClose={params.onClose}
+            />
         </Dialog>
     );
 }

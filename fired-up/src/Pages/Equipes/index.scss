@@ -13,6 +13,15 @@
   }
 }
 
+@media (max-width: 600px) {
+  .opcao {
+    display: grid;
+    gap: 2vw;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
 .listaEquipes {
   display: flex;
   flex-wrap: wrap;
@@ -25,12 +34,14 @@
   }
 }
 
+
+
 .botaoEquipe {
   background-color: var(--laranja-principal);
-  margin-left: 50px;
+  margin-left: 5vw;
   color: white;
-  font-size: 24px;
-  padding: 10px 20px;
+  font-size: calc(8px + 1vw);
+  padding: 1%;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -39,5 +50,20 @@
 
   &:hover {
     background-color: darken(#f78b1f, 10%);
+  }
+}
+
+/* Media query para telas menores que 300px */
+@media (max-width: 600px) {
+  .listaEquipes {
+    display: flex;
+    flex-direction: column;
+    gap: 6vw; /* Ajusta o espaçamento entre os itens */
+    justify-items: center; /* Centraliza os itens dentro do grid horizontalmente */
+    align-items: center; /* Centraliza os itens dentro do grid verticalmente */
+    height: 100vh;
+  }
+  .botaoEquipe {
+    margin: 0;
   }
 }

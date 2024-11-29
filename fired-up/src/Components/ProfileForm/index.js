@@ -18,7 +18,6 @@ export function ProfileForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
   };
 
   return (
