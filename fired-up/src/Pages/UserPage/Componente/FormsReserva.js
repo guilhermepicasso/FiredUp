@@ -9,6 +9,7 @@ export default function FormsReserva(params) {
             onClose={params.onClose}
         >
             <FormularioReserva
+                modalidade={params.modalidade}
                 reserva={params.reserva ? params.reserva : null}
                 equipe={params.equipe}
                 onActionCompleted={params.onActionCompleted}

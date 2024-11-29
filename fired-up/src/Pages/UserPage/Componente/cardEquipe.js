@@ -108,6 +108,7 @@ export default function CardEquipe(params) {
     return (
         <div className="card_equipe" key={equipe.idEquipe}>
             <FormsReserva
+                modalidade={modalidades.find(modalidade => modalidade.idModalidade === equipe.idModalidade)?.idModalidade}
                 reserva={dadosReserva.status !== null ? dadosReserva : null}
                 equipe={equipe}
                 open={openForms}

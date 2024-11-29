@@ -49,7 +49,7 @@ export default function FormularioReserva(params) {
   };
 
   const reservar = async (e) => {
-    e.preventDefault();    
+    e.preventDefault();
     // Validar campos
     if (!espacoSelecionado || !data || !horaInicio || !params.equipe) {
       toast.info("Por favor, preencha todos os campos");
@@ -87,6 +87,49 @@ export default function FormularioReserva(params) {
     params.onClose();
     params.onActionCompleted();
   };
+
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       console.log(params.modalidade);
+
+  //       // Fazendo a requisição para buscar os espaços
+  //       const espacos = await buscar(`ModalidadeEspaco/idModalidade/${params.modalidade}`);
+
+  //       // Verifique se espacos é um array antes de tentar usar .map
+  //       if (Array.isArray(espacos)) {
+  //         // Use uma Promise.all para buscar as informações dos espaços de forma assíncrona
+  //         const infoEspacos = await Promise.all(
+  //           espacos.map(async (espaco) => {
+  //             const data = await buscar(`espac/idEspaco/${espaco.idEspaco}`);
+  //             console.log("dados do espaço", data);
+  //             return data;
+  //           })
+  //         );
+
+  //         // Verifica se não há espaços
+  //         if (infoEspacos.length === 0) {
+  //           toast.warning("Não há espaços disponíveis para esta modalidade.");
+  //         } else {
+  //           // Caso contrário, atualiza o estado com os espaços encontrados
+  //           setEspacos(infoEspacos);
+  //         }
+  //       } else {
+  //         console.log("A resposta de espaços não é um array:", espacos);
+  //       }
+  //     } catch (error) {
+  //       console.log("Erro ao buscar a lista de espaços:", error);
+  //       toast.error("Erro ao buscar espaços.");
+  //     }
+  //   };
+
+
+
+
+
+
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -225,9 +268,9 @@ export default function FormularioReserva(params) {
       <h1>Solicitar Reserva</h1>
 
       <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label" required>{params.equipe.idEquipe}Espaço</InputLabel>
+        <InputLabel id="demo-simple-select-label" required>Espaço</InputLabel>
         <Select
-          disabled={!editar}
+          disabled={!editar && params.reserva}
           labelId="demo-simple-select-label"
           id="demo-simple-select"
           value={espacoSelecionado}

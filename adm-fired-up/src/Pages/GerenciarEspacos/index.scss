@@ -1,0 +1,44 @@
+.GerenciarEspaco {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+  
+  .content {
+    min-height: 100%;
+    display: flex;
+    gap: 4vw;
+    flex-direction: column;
+    padding: 4%;
+    .cabecalho {
+      display: flex;
+      width: 100%;
+      gap: 2%;
+    }
+    .list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2vw;
+      width: 100%;
+      justify-content: baseline;
+      .card {
+        border: 1px solid var(--laranja-principal);
+        padding: 1%;
+        display: flex;
+        height: fit-content;
+        justify-content: center;
+        align-items: center;
+        gap: 1vw;
+
+        .cardContent {
+          display: flex;
+          flex-direction: column;
+
+          p {
+            margin: 0;
+          }
+        }
+      }
+    }
+  }
+}
