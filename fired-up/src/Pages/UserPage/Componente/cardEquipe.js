@@ -40,7 +40,7 @@ export default function CardEquipe(params) {
             }
         }
     };
-    
+
 
     const buscarReservaEquipe = async () => {
         try {
@@ -97,8 +97,12 @@ export default function CardEquipe(params) {
         setOpen(true);
     };
 
-    const handleClose = () => {
+    const handleClose = async () => {
         setOpen(false); // Atualiza o estado para fechar o diálogo
+        if (type === "cancelar_reserva" || type === "deletar_equipe") {
+            await buscarQtdParticipantes(); // Recarregar as vagas
+            await buscarReservaEquipe(); // Recarregar a reserva da equipe
+        }
     };
 
     const handleCloseForms = () => {
@@ -121,7 +125,13 @@ export default function CardEquipe(params) {
                 button={type}
                 onClose={handleClose}
                 id={type === "Sair da Equipe" ? equipe.idParticipante : type === "Deletar Equipe" ? equipe.idEquipe : dadosReserva.idReserva}
-                onActionCompleted={params.onDataChanged}
+                onActionCompleted={async () => {
+                    await buscarQtdParticipantes();
+                    await buscarReservaEquipe();
+                    if (params.onDataChanged) {
+                        params.onDataChanged(); 
+                    }
+                }}
             />
             <div className="modalidade">
                 <div className="img_modalidade">
@@ -134,7 +144,7 @@ export default function CardEquipe(params) {
             </div>
             <div>
                 <p>{equipe.NomeEquipe}</p>
-                {dadosReserva.status === 1 &&
+                {(dadosReserva.status === 1 || dadosReserva.status === 0) &&
                     <div className="reserva">
                         <p className="titulo">Dados da reserva</p>
                         <p>Espaço: {dadosReserva.idEspaco}</p>
@@ -152,22 +162,36 @@ export default function CardEquipe(params) {
             {my ? (
                 <div className="acoes">
                     <button
-                        onClick={() => dadosReserva.status !== null && dadosReserva.status ? handleClickOpen("cancelar_reserva") : handleReservarEspaco()}
+                        onClick={() => dadosReserva.status === null ? handleReservarEspaco() : null}
                         className={dadosReserva.status === null
                             ? 'btn-success'
-                            : dadosReserva.status
-                                ? 'btn-cancel'
-                                : 'btn-pend'
+                            : dadosReserva.status === 0
+                                ? 'btn-pend'
+                                : 'btn-auth'
                         }
                     >
                         {dadosReserva.status === null
                             ? 'Reservar espaço'
-                            : dadosReserva.status
-                                ? 'Cancelar Reserva'
-                                : 'Reserva pendente'
+                            : dadosReserva.status === 0
+                                ? 'Reserva pendente'
+                                : 'Reserva Autorizada'
                         }
                     </button>
-                    <button className='btn-cancel' onClick={() => handleClickOpen("deletar_equipe")}>Deletar equipe</button>
+                    <button
+                    className='btn-cancel'
+                    onClick={() => {
+                        if (dadosReserva.status === null) {
+                            handleClickOpen("deletar_equipe");  // Se status for null, abre "Deletar Equipe"
+                        } else {
+                            handleClickOpen("cancelar_reserva"); // 0 ou 1, abre "Cancelar Reserva"
+                        }
+                    }}
+                >
+                    {dadosReserva.status === null
+                        ? 'Deletar Equipe'  // Para Status null, "Deletar Equipe"
+                        : 'Cancelar Reserva'  // Para Status 0 ou 1, "Cancelar Reserva"
+                    }
+                </button>
                 </div>
             ) : (
                 <div className="acoes">

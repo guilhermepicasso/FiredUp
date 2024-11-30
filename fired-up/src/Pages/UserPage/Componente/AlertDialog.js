@@ -14,7 +14,7 @@ export default function AlertDialog(params) {
     try {
       if (params.button === "Sair da Equipe") {
         console.log("Tentando sair da equipe", params.id);
-        
+
         await deletar(`Participante/${params.id}`);
         toast.success("Você saiu da equipe!");
 
@@ -30,7 +30,7 @@ export default function AlertDialog(params) {
     } catch (error) {
       toast.error("Erro ao tentar executar ação!");
       console.log(error);
-      
+
     }
     params.onClose();
     params.onActionCompleted();
@@ -44,11 +44,11 @@ export default function AlertDialog(params) {
       aria-describedby="alert-dialog-description"
     >
       <DialogTitle id="alert-dialog-title">
-        {params.button === "Sair da Equipe" ? 
-        "Deseja realmente sair desta equipe?" :
-        params.button === "Deletar Equipe" ? 
-        "Deseja realmente deletar esta equipe?" : 
-        "Deseja realmente excluir esta reserva?"}
+        {params.button === "Sair da Equipe" ?
+          "Deseja realmente sair desta equipe?" :
+          params.button === "Deletar Equipe" ?
+            "Deseja realmente deletar esta equipe?" :
+            "Deseja realmente excluir esta reserva?"}
       </DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
@@ -58,7 +58,7 @@ export default function AlertDialog(params) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => (params.onClose)}>Cancelar</Button>
+        <Button onClick={() => params.onClose()} >Cancelar</Button>
         <Button onClick={() => (deletarDados())} autoFocus>
           {params.button}
         </Button>
