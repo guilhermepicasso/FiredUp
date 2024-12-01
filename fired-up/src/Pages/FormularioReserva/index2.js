@@ -290,7 +290,7 @@ export default function FormularioReserva(params) {
             {/* Selecionar Data */}
             <DemoContainer components={['DatePicker']}>
               <DatePicker
-                disabled={!editar}
+                disabled={params.reserva && !editar}
                 label="Selecionar Data"
                 value={data}
                 minDate={dayjs()} // A data mínima é hoje
@@ -302,7 +302,7 @@ export default function FormularioReserva(params) {
             {/* Hora inicial */}
             <DemoContainer components={['TimePicker']}>
               <TimePicker
-                disabled={!editar}
+                disabled={params.reserva && !editar}
                 label="Hora inicial"
                 value={horaInicio}
                 minTime={getHorarioFuncionamento(data) ? dayjs(getHorarioFuncionamento(data).horaInicio, 'HH:mm:ss') : null}
@@ -338,7 +338,7 @@ export default function FormularioReserva(params) {
       )}
 
       <Stack direction="row" spacing={2}>
-        <Button variant="contained" onClick={(e) => (!editar ? setEditar(true) : reservar(e))}>
+        <Button variant="contained" onClick={(e) => (params.reserva && !editar ? setEditar(true) : reservar(e))}>
           {params.reserva && !editar ? 'Alterar Reserva' : "Reservar Espaço"}
         </Button>
       </Stack>

@@ -162,7 +162,7 @@ export default function CardEquipe(params) {
             {my ? (
                 <div className="acoes">
                     <button
-                        onClick={() => dadosReserva.status === null ? handleReservarEspaco() : null}
+                        onClick={() => handleReservarEspaco()}
                         className={dadosReserva.status === null
                             ? 'btn-success'
                             : dadosReserva.status === 0

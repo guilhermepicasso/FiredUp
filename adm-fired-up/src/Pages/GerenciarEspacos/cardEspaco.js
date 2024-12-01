@@ -6,6 +6,19 @@ export default function CardEspaco(params) {
     const [modalidades, setModalidades] = useState([])
     const [itens, setItens] = useState([])
 
+    const horariosAgrupados = horarios.reduce((acc, horario) => {
+        if (acc[horario.diaSemana]) {
+            acc[horario.diaSemana].push(
+                `das ${horario.horaInicio.slice(0, 5)} às ${horario.horaFim.slice(0, 5)}`
+            );
+        } else {
+            acc[horario.diaSemana] = [
+                `das ${horario.horaInicio.slice(0, 5)} às ${horario.horaFim.slice(0, 5)}`
+            ];
+        }
+        return acc;
+    }, {});
+
     useEffect(() => {
         const fetchHorarios = async () => {
             try {
@@ -18,7 +31,13 @@ export default function CardEspaco(params) {
             }
             try {
                 const result = await buscar(`ModalidadeEspaco/idEspaco/${params.espaco.idEspaco}`)
-                setModalidades(result)
+                const nomesModalidades = result
+                    .map(item => {
+                        const modalidade = params.modalidades.find(mod => mod.idModalidade === item.idModalidade);
+                        return modalidade ? modalidade.Nome : null;
+                    })
+                    .filter(nome => nome !== null);
+                setModalidades(nomesModalidades)
             } catch (error) {
                 if (error.status !== 404) {
                     console.log(error);
@@ -26,7 +45,13 @@ export default function CardEspaco(params) {
             }
             try {
                 const result = await buscar(`ItemEspaco/idEspaco/${params.espaco.idEspaco}`)
-                setItens(result)
+                const nomesItens = result
+                    .map(item => {
+                        const itemEspaco = params.itens.find(mod => mod.idItem === item.idItem);
+                        return itemEspaco ? itemEspaco.Nome : null;
+                    })
+                    .filter(nome => nome !== null);
+                setItens(nomesItens)
             } catch (error) {
                 if (error.status !== 404) {
                     console.log(error);
@@ -39,10 +64,10 @@ export default function CardEspaco(params) {
     }, [])
 
     return (
-        <div className="card cardItens">
+        <div className="card cardEspaco">
             <div>
                 <div>
-                    <img></img>
+                    <img src={params.espaco.Foto} alt={`Foto da ${params.espaco.Nome}`} />
                 </div>
                 <p>{params.espaco.Nome}</p>
                 <div>
@@ -54,23 +79,19 @@ export default function CardEspaco(params) {
                             overflowY: 'auto', /* Habilita a rolagem vertical */
                             resize: 'vertical', /* Permite redimensionar o campo */
                         }}
-                    >
-                        {params.espaco.regras}
-                    </textarea>
+                        value={params.espaco.Regras}
+                        readOnly={true} // O textarea é somente leitura se isEditable for falso
+                    />
                 </div>
             </div>
 
             <div>
                 <p>Horario de funcionamento</p>
-                {horarios &&
-                    horarios.map(horario => (
-                        <div>
-                            <p>{horario.diaSemana}</p>
-                            <p>{horario.horaInicio} as {horario.horaFim}</p>
-                        </div>
-                    ))
-                }
-
+                {Object.keys(horariosAgrupados).map(dia => (
+                    <p key={dia}>
+                        {dia} {horariosAgrupados[dia].join(' e ')}
+                    </p>
+                ))}
             </div>
 
             <div>
@@ -78,18 +99,18 @@ export default function CardEspaco(params) {
                 {modalidades &&
                     modalidades.map(modalidade => (
                         <div>
-                            <p>{modalidade.idModalidade}</p>
+                            <p>{modalidade}</p>
                         </div>
                     ))
                 }
             </div>
-            
+
             <div>
                 <p>Itens que podem ser retirados</p>
                 {itens &&
                     itens.map(item => (
                         <div>
-                            <p>{item.idItem}</p>
+                            <p>{item}</p>
                         </div>
                     ))
                 }
