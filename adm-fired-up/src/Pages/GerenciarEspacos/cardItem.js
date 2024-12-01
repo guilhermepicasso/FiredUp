@@ -121,17 +121,27 @@ export default function CardItem(params) {
     return (
         <section>
             <div className="cabecalho">
-                <h2>Lista de {params.tipo}</h2>
-                <Button variant="contained" onClick={handleChange}>
-                    Adicionar <AddOutlinedIcon />
+                <h2>Lista de {params.tipo}s</h2>
+                <Button
+                    variant="contained"
+                    onClick={handleChange}
+                    endIcon={<AddOutlinedIcon />}
+                    sx={{
+                        backgroundColor: "#F78B1F",  // Cor de fundo
+                        '&:hover': {
+                            backgroundColor: "#f17800", // Cor de fundo ao passar o mouse (hover)
+                        }
+                    }}
+                >
+                    Criar {params.tipo}
                 </Button>
             </div>
             <div className="list">
                 {params.itens.map((item) => (
 
-                    <div key={item.idItem} className={`card ${params.tipo === "modalidades" ? 'cardModalidades' : 'cardItens'}`}>
+                    <div key={item.idItem} className={`card ${params.tipo === "modalidade" ? 'cardModalidades' : 'cardItens'}`}>
                         <div>
-                            {params.tipo !== "modalidades" ? (
+                            {params.tipo !== "modalidade" ? (
                                 editMode === item.idItem ? (
                                     <div className="cardContent contentInfo">
                                         <input
@@ -175,14 +185,14 @@ export default function CardItem(params) {
                             <button
                                 className="botao botaoExcluir"
                                 onClick={() => {
-                                    const id = params.tipo === "modalidades" ? item.idModalidade : item.idItem;
-                                    const tipo = params.tipo === "modalidades" ? "modalidade" : "item";
+                                    const id = params.tipo === "modalidade" ? item.idModalidade : item.idItem;
+                                    const tipo = params.tipo === "modalidade" ? "modalidade" : "item";
                                     handleExcluir(id, tipo);
                                 }}
                             >
                                 <DeleteIcon fontSize="small" />
                             </button>
-                            {params.tipo !== "modalidades" && (
+                            {params.tipo !== "modalidade" && (
                                 editMode === item.idItem ? (
                                     <button
                                         className="botao botaoEditar"

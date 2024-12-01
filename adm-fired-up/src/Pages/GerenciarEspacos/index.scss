@@ -33,6 +33,12 @@
       justify-content: baseline;
 
       padding-bottom: 4%;
+
+      .cardTitle {
+        color: var(--laranja-principal);
+        font-weight: bold;
+        text-align: center;
+      }
       .card {
         border: 1px solid var(--laranja-principal);
         padding: 1%;
@@ -61,10 +67,7 @@
             background-color: #ff5f5f;
           }
   
-          .cardTitle {
-            color: var(--laranja-principal);
-            font-weight: bold;
-          }
+          
           p {
             margin: 0;
           }

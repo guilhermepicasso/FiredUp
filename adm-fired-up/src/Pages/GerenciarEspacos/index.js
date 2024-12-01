@@ -160,8 +160,8 @@ function GerenciarEspaco() {
             <Header />
             <h1>Gerenciar espaço</h1>
             <div className="content">
-                <CardItem change={change} itens={itens} tipo={"itens"} />
-                <CardItem change={change} itens={modalidades} tipo={"modalidades"} />
+                <CardItem change={change} itens={itens} tipo={"iten"} />
+                <CardItem change={change} itens={modalidades} tipo={"modalidade"} />
 
                 <section>
                     <div className="cabecalho">

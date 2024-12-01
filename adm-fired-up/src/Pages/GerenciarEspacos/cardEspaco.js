@@ -69,7 +69,7 @@ export default function CardEspaco(params) {
                 <div>
                     <img src={params.espaco.Foto} alt={`Foto da ${params.espaco.Nome}`} />
                 </div>
-                <p>{params.espaco.Nome}</p>
+                <p className="cardTitle">{params.espaco.Nome}</p>
                 <div>
                     <p>Regras</p>
                     <textarea
@@ -86,7 +86,7 @@ export default function CardEspaco(params) {
             </div>
 
             <div>
-                <p>Horario de funcionamento</p>
+                <p className="cardTitle">Horario de funcionamento</p>
                 {Object.keys(horariosAgrupados).map(dia => (
                     <p key={dia}>
                         {dia} {horariosAgrupados[dia].join(' e ')}
@@ -95,7 +95,7 @@ export default function CardEspaco(params) {
             </div>
 
             <div>
-                <p>Modalidades que podem ser praticadas</p>
+                <p className="cardTitle">Modalidades que podem ser praticadas</p>
                 {modalidades &&
                     modalidades.map(modalidade => (
                         <div>
@@ -106,7 +106,7 @@ export default function CardEspaco(params) {
             </div>
 
             <div>
-                <p>Itens que podem ser retirados</p>
+                <p className="cardTitle">Itens que podem ser retirados</p>
                 {itens &&
                     itens.map(item => (
                         <div>
