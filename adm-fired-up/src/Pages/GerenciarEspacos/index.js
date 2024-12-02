@@ -4,12 +4,12 @@ import { v4 as uuidv4 } from 'uuid';
 
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
-import { buscar } from "../../API/chamadas";
+import { buscar, criar } from "../../API/chamadas";
 import Button from '@mui/material/Button';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import CardEspaco from "./cardEspaco";
 import CancelIcon from '@mui/icons-material/Cancel';
-// import modalidadesJson from '../../../public/modalidades.json'
+import modalidadesJson from '../../../src/modalidades.json'
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import CardItem from "./cardItem";
@@ -21,6 +21,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import { toast } from "react-toastify";
 
 function GerenciarEspaco() {
     const [itens, setItens] = useState([]);
@@ -156,6 +157,25 @@ function GerenciarEspaco() {
         setAge(event.target.value);
     };
 
+    const saveModalidade = async () => {
+        const modalidadeExiste = modalidades.find(modalidade => modalidade.Nome === age.modalidade);
+        if (modalidadeExiste) {
+            toast.warn("Esta modalidade já existe!")
+        } else {
+            try {
+                const body = {
+                    Nome: age.modalidade,
+                    Foto: age.imagem
+                }
+                await criar({tabela: "modalidade", body: body})
+                toast.success("Modalidade cadastrada com sucesso!")
+                change("Modalidade")
+                setOpen(false);
+            } catch (error) {
+                toast.error("Erro ao cadastrar nova modalidade! ", error)
+            }
+        }
+    }
 
     return (
         <div className="GerenciarEspaco">
@@ -176,16 +196,15 @@ function GerenciarEspaco() {
                                 label="Modalidade"
                                 onChange={handleChange}
                             >
-                                {/* {modalidadesJson.map(modalidade => (
-                                    <MenuItem value={modalidade.id}>{modalidade.modalidade}</MenuItem>
-                                ))} */}
-                                <MenuItem value={20}>Twenty</MenuItem>
-                                <MenuItem value={30}>Thirty</MenuItem>
+                                {}
+                                {modalidadesJson.map(modalidade => (
+                                    <MenuItem value={modalidade}>{modalidade.modalidade}</MenuItem>
+                                ))}
                             </Select>
                             <div>
                                 <Button
                                     variant="contained"
-                                    onClick={handleChangeItens}
+                                    onClick={() => saveModalidade()}
                                 >
                                     Salvar
                                 </Button>
