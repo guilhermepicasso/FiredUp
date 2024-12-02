@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react"
-import { buscar } from "../../API/chamadas"
+import Card from "./card"
+import { buscarId } from "../../API/chamadas"
+import CardModalidade from "./cardModalidade"
 
 export default function CardEspaco(params) {
-    const [horarios, setHorarios] = useState([])
-    const [modalidades, setModalidades] = useState([])
-    const [itens, setItens] = useState([])
+    const [modalidadesEspaco, setModalidadesEspaco] = useState([])
+    const [itensEspaco, setItensEspaco] = useState([])
+    const [horariosEspaco, setHorariosEspaco] = useState([])
 
-    const horariosAgrupados = horarios.reduce((acc, horario) => {
+    const horariosAgrupados = horariosEspaco.reduce((acc, horario) => {
         if (acc[horario.diaSemana]) {
             acc[horario.diaSemana].push(
                 `das ${horario.horaInicio.slice(0, 5)} às ${horario.horaFim.slice(0, 5)}`
@@ -19,48 +21,36 @@ export default function CardEspaco(params) {
         return acc;
     }, {});
 
+    const fetchInfo = async (tabela) => {
+        try {
+            const result = await buscarId({ tabela: tabela, busca: "idEspaco", id: params.espaco.idEspaco })
+            if (tabela === "modalidadeEspaco") {
+                const modalidades = params.modalidades.filter(mod => mod.idModalidade === result.data[0].idModalidade);
+                modalidades.forEach(modalidade => {
+                    modalidade.idModalidadeEspaco = result.data[0].idModalidadeEspaco;
+                });
+                setModalidadesEspaco(modalidades);
+            } else if (tabela === "itemEspaco") {
+                const itens = params.itens.filter(itensEspaco => itensEspaco.idItem === result.data[0].idItem);
+                itens.forEach(item => {
+                    item.idItemEspaco = result.data[0].idItemEspaco;
+                })
+                setItensEspaco(itens);
+            } else {
+                setHorariosEspaco(result.data);
+            }
+        } catch (error) {
+            if (error.status !== 404) {
+                console.log(error);
+
+            }
+        }
+    }
+
     useEffect(() => {
-        const fetchHorarios = async () => {
-            try {
-                const result = await buscar(`HorarioFuncionamento/idEspaco/${params.espaco.idEspaco}`)
-                setHorarios(result)
-            } catch (error) {
-                if (error.status !== 404) {
-                    console.log(error);
-                }
-            }
-            try {
-                const result = await buscar(`ModalidadeEspaco/idEspaco/${params.espaco.idEspaco}`)
-                const nomesModalidades = result
-                    .map(item => {
-                        const modalidade = params.modalidades.find(mod => mod.idModalidade === item.idModalidade);
-                        return modalidade ? modalidade.Nome : null;
-                    })
-                    .filter(nome => nome !== null);
-                setModalidades(nomesModalidades)
-            } catch (error) {
-                if (error.status !== 404) {
-                    console.log(error);
-                }
-            }
-            try {
-                const result = await buscar(`ItemEspaco/idEspaco/${params.espaco.idEspaco}`)
-                const nomesItens = result
-                    .map(item => {
-                        const itemEspaco = params.itens.find(mod => mod.idItem === item.idItem);
-                        return itemEspaco ? itemEspaco.Nome : null;
-                    })
-                    .filter(nome => nome !== null);
-                setItens(nomesItens)
-            } catch (error) {
-                if (error.status !== 404) {
-                    console.log(error);
-                }
-            }
-        }
-        if (params.espaco) {
-            fetchHorarios()
-        }
+        fetchInfo("modalidadeEspaco");
+        fetchInfo("itemEspaco");
+        fetchInfo("HorarioFuncionamento");
     }, [])
 
     return (
@@ -87,33 +77,33 @@ export default function CardEspaco(params) {
 
             <div>
                 <p className="cardTitle">Horario de funcionamento</p>
-                {Object.keys(horariosAgrupados).map(dia => (
-                    <p key={dia}>
-                        {dia} {horariosAgrupados[dia].join(' e ')}
-                    </p>
-                ))}
+                {horariosEspaco && (
+                    Object.keys(horariosAgrupados).map(dia => (
+                        <p key={dia}>
+                            {dia} {horariosAgrupados[dia].join(' e ')}
+                        </p>
+                    ))
+                )}
             </div>
 
             <div>
                 <p className="cardTitle">Modalidades que podem ser praticadas</p>
-                {modalidades &&
-                    modalidades.map(modalidade => (
-                        <div>
-                            <p>{modalidade}</p>
-                        </div>
+                <div className="list">
+                    {modalidadesEspaco.map(modalidade => (
+                        <CardModalidade modalidade={modalidade} editalvel={false} />
                     ))
-                }
+                    }
+                </div>
             </div>
 
             <div>
                 <p className="cardTitle">Itens que podem ser retirados</p>
-                {itens &&
-                    itens.map(item => (
-                        <div>
-                            <p>{item}</p>
-                        </div>
+                <div className="list">
+                    {itensEspaco.map(item => (
+                        <CardModalidade modalidade={item} editalvel={false} />
                     ))
-                }
+                    }
+                </div>
             </div>
         </div>
     )

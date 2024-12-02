@@ -1,76 +1,84 @@
 import "./index.scss"
 import { useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
-import { alterar, buscar, deletar } from "../../API/chamadas";
+import { buscar } from "../../API/chamadas";
 import Button from '@mui/material/Button';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import CheckIcon from '@mui/icons-material/Check';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import CardEspaco from "./cardEspaco";
+import CancelIcon from '@mui/icons-material/Cancel';
+// import modalidadesJson from '../../../public/modalidades.json'
 
-import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import { toast } from 'react-toastify';
 import CardItem from "./cardItem";
+import CardModalidade from "./cardModalidade";
+import Dialog from '@mui/material/Dialog';
+
+import Box from '@mui/material/Box';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 
 function GerenciarEspaco() {
-    const [itens, setItems] = useState([]);
+    const [itens, setItens] = useState([]);
     const [modalidades, setModalidades] = useState([]);
     const [espacos, setEspacos] = useState([]);
-    const [editItem, setEditItem] = useState(false);
-    const [editMode, setEditMode] = useState(null);
-    const [editedItem, setEditedItem] = useState({});
 
+    const [isCreating, setIsCreating] = useState(false);
 
-    const handleChange = () => {
+    // Novo estado para armazenar informações de cada espaço separadamente
+    const [dadosEspacos, setDadosEspacos] = useState({});
 
-    }
-
-    const handleExcluir = (id, tabela) => {
-        confirmAlert({
-            title: 'Confirmar exclusão',
-            message: 'Você tem certeza que deseja excluir esta reserva?',
-            buttons: [
-                {
-                    label: 'Sim',
-                    onClick: () => {
-                        deletar({ tabela: tabela, id })
-                            .then(() => {
-                                toast.success('Exclusão realizada com sucesso!');
-                                if (tabela === "Item") {
-                                    setItems((prevItens) => prevItens.filter((res) => res.idItem !== id));
-                                } else if ("Modalidade") {
-                                    setModalidades((prevModalidades) => prevModalidades.filter((res) => res.idModalidade !== id));
-                                } else if (tabela === "espaco") {
-                                    setEspacos((prevEspacos) => prevEspacos.filter((res) => res.idEspaco !== id));
-                                }
-                            })
-                            .catch((error) => {
-                                toast.error(`Erro ao excluir: ${error}`);
-                            });
-                    }
-                },
-                {
-                    label: 'Não',
-                    onClick: () => {
-                        toast.info('Exclusão cancelada');
-                    }
-                }
-            ]
-        });
-    };
-
-    const change = async (tabela) => {
+    const change = async (tabela, id) => {
         try {
-            const itens = await buscar(tabela)
+            const result = await buscar((tabela === "Modalidade" || tabela === "Item" || tabela === "Espaco") ? tabela : `${tabela}/idEspaco/${id}`)
             if (tabela === "Item") {
-                setItems(itens);
+                setItens(result);
             } else if (tabela === "Modalidade") {
-                setModalidades(itens)
-            } else {
-                setEspacos(itens)
+                setModalidades(result)
+            } else if (tabela === "ItemEspaco") {
+                setDadosEspacos(prevState => ({
+                    ...prevState,
+                    [id]: {
+                        ...prevState[id],
+                        itensEspaco: result.map(item => {
+                            // Encontra o nome correspondente do item na lista de itens
+                            const itemCorrespondente = itens.find(it => it.idItem === item.idItem);
+                            return itemCorrespondente;
+                            // id: item.idItemEspaco,  // Id do espaço da modalidade
+                            // Nome: itemCorrespondente ? itemCorrespondente.Nome : "Nome não encontrado"  // Usa o Nome correspondente
+
+                        })
+                    }
+                }));
+            } else if (tabela === "ModalidadeEspaco") {
+                setDadosEspacos(prevState => ({
+                    ...prevState,
+                    [id]: {
+                        ...prevState[id],
+                        modalidadesEspaco: result.map(item => {
+                            // Encontra o nome correspondente do item na lista de itens
+                            const itemCorrespondente = modalidades.find(it => it.idModalidade === item.idModalidade);
+                            return {
+                                id: item.idModalidadeEspaco,  // Id do espaço da modalidade
+                                Nome: itemCorrespondente ? itemCorrespondente.Nome : "Nome não encontrado"  // Usa o Nome correspondente
+                            };
+                        })
+                    }
+                }));
+            } else if (tabela === "HorarioFuncionamento") {
+                setDadosEspacos(prevState => ({
+                    ...prevState,
+                    [id]: {
+                        ...prevState[id],
+                        horariosEspaco: result // Armazena horários para cada espaço
+                    }
+                }));
+            } else if (tabela === "Espaco") {
+                setEspacos(result);
             }
         } catch (error) {
             if (error.status !== 404) {
@@ -79,100 +87,187 @@ function GerenciarEspaco() {
         }
     }
 
+    const fetchDadosEspaco = async () => {
+        await change("Espaco");
+        for (let espaco of espacos) {
+            await Promise.all([
+                change("ItemEspaco", espaco.idEspaco),
+                change("ModalidadeEspaco", espaco.idEspaco),
+                change("HorarioFuncionamento", espaco.idEspaco)
+            ]);
+        }
+    };
+
+
+
+
+    const fetchEspacosData = async () => {
+        await Promise.all([
+            change("Item"),
+            change("Modalidade"),
+            change("Espaco")
+        ]);
+
+        // Agora, para cada espaço, busca as informações específicas
+        for (let espaco of espacos) {
+            await Promise.all([
+                change("ItemEspaco", espaco.idEspaco),
+                change("ModalidadeEspaco", espaco.idEspaco),
+                change("HorarioFuncionamento", espaco.idEspaco)
+            ]);
+        }
+    };
+
+    // Buscar dados ao carregar
     useEffect(() => {
-        change("Item");
-        change("Modalidade");
-        change("Espaco");
-    }, [])
+        fetchEspacosData();
+    }, []);
 
-    const handleInputChange = (e, field) => {
-        const value = e.target.value;
-
-        // Garantir que os valores de QtdTotal e QtdDisponivel sejam inteiros
-        if (field === 'QtdTotal' || field === 'QtdDisponivel') {
-            const intValue = parseInt(value, 10);
-            setEditedItem({
-                ...editedItem,
-                [field]: isNaN(intValue) ? '' : intValue, // Caso o valor seja inválido, manter em branco
-            });
+    const handleChangeItens = () => {
+        if (isCreating) {
+            // Se o botão for "Cancelar", remove o último item vazio da lista
+            setItens(itens.filter(item => item.Nome !== ""));
         } else {
-            setEditedItem({
-                ...editedItem,
-                [field]: value,
-            });
+            // Adiciona um novo item vazio à lista
+            setItens([
+                ...itens,
+                {
+                    idItem: uuidv4(),
+                    Nome: "", // Nome vazio
+                    QtdTotal: "",
+                    QtdDisponivel: "",
+                }
+            ]);
         }
+        setIsCreating(!isCreating);  // Alterna entre os estados "Criar" e "Cancelar"
     };
 
+    const handleChangeModalidade = () => {
 
-    // Função que ativa/desativa o modo de edição
-    const handleEdit = async (itemId) => {
-        if (editMode === itemId) {
-            // Se o item já estiver em edição, desativa a edição
-            const updatedItens = itens.map(item => {
-                if (item.idItem === itemId) {
-                    const updatedItem = {};
+    }
 
-                    // Verificar cada campo e adicionar ao objeto apenas se houver mudança
-                    if (editedItem.Nome !== item.Nome) {
-                        updatedItem.Nome = editedItem.Nome;
-                    }
-                    if (editedItem.QtdTotal !== parseInt(item.QtdTotal, 10)) {
-                        updatedItem.QtdTotal = parseInt(editedItem.QtdTotal, 10);
-                    }
-                    if (editedItem.QtdDisponivel !== parseInt(item.QtdDisponivel, 10)) {
-                        updatedItem.QtdDisponivel = parseInt(editedItem.QtdDisponivel, 10);
-                    }
+    const [open, setOpen] = useState(false);
+    const [age, setAge] = useState('');
+    const onClose = () => {
+        setOpen(false);
+    }
 
-                    // Se houver alterações, retorna o objeto com as mudanças
-                    return Object.keys(updatedItem).length > 0 ? updatedItem : null;
-                }
-
-                // Se o item não for o editado, retorna ele sem alterações
-                return item;
-            }).filter(item => item !== null); // Filtra os nulls para manter apenas os itens alterados
-
-            // Se não houver alterações, desative o EditMode
-            if (updatedItens.length !== 0) {
-                setEditMode(null); // Desativa o modo de edição
-                try {
-                    const result = await alterar({ tabela: "Item", id: itemId, body: updatedItens[0] });
-                    console.log(result);
-                    change("Item")
-                } catch (error) {
-                    console.log(error);
-                }
-            }
-            setEditMode(null);
-        } else {
-            // Ativa a edição para o item
-            setEditMode(itemId);
-            const itemToEdit = itens.find(item => item.idItem === itemId);
-            setEditedItem({
-                Nome: itemToEdit.Nome,
-                QtdTotal: itemToEdit.QtdTotal,
-                QtdDisponivel: itemToEdit.QtdDisponivel,
-            });
-        }
+    const handleChange = (event) => {
+        setAge(event.target.value);
     };
+
 
     return (
         <div className="GerenciarEspaco">
             <Header />
+            <Dialog
+                open={open}
+                onClose={onClose}
+            >
+                <div style={{ padding: "2vw" }}>
+                    <h1>Adicionar nova modalidade</h1>
+                    <Box sx={{ minWidth: 120 }}>
+                        <FormControl fullWidth>
+                            <InputLabel id="demo-simple-select-label">Modalidade</InputLabel>
+                            <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={age}
+                                label="Modalidade"
+                                onChange={handleChange}
+                            >
+                                {/* {modalidadesJson.map(modalidade => (
+                                    <MenuItem value={modalidade.id}>{modalidade.modalidade}</MenuItem>
+                                ))} */}
+                                <MenuItem value={20}>Twenty</MenuItem>
+                                <MenuItem value={30}>Thirty</MenuItem>
+                            </Select>
+                            <div>
+                                <Button
+                                    variant="contained"
+                                    onClick={handleChangeItens}
+                                >
+                                    Salvar
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    onClick={() => setOpen(false)}
+                                >
+                                    Cancelar
+                                </Button>
+                            </div>
+                        </FormControl>
+                    </Box>
+                </div>
+            </Dialog>
             <h1>Gerenciar espaço</h1>
             <div className="content">
-                <CardItem change={change} itens={itens} tipo={"iten"} />
-                <CardItem change={change} itens={modalidades} tipo={"modalidade"} />
-
                 <section>
                     <div className="cabecalho">
-                        <h2>Lista de Espaços</h2>
-                        <Button variant="contained" onClick={handleChange}>
-                            Adicionar Espaço <AddOutlinedIcon />
+                        <h2>Lista de itens</h2>
+                        <Button
+                            variant="contained"
+                            onClick={handleChangeItens}
+                            endIcon={isCreating ? <CancelIcon /> : <AddOutlinedIcon />}
+                            sx={{
+                                backgroundColor: isCreating ? "red" : "#F78B1F"
+                            }}
+                        >
+                            {isCreating ? "Cancelar" : "Criar Item"}
                         </Button>
                     </div>
                     <div className="list">
-                        {espacos.map((espaco, key) => (
-                            <CardEspaco itens={itens} modalidades={modalidades} espaco={espaco}></CardEspaco>
+                        {itens.map((item) => (
+
+                            <CardItem key={item.idItem} item={item} />
+                        ))}
+                    </div>
+                </section>
+
+                <section>
+                    <div className="cabecalho">
+                        <h2>Lista de modalidades</h2>
+                        <Button
+                            variant="contained"
+                            onClick={() => setOpen(true)}
+                            endIcon={<AddOutlinedIcon />}
+                            sx={{
+                                backgroundColor: "#F78B1F",  // Cor de fundo
+                                '&:hover': {
+                                    backgroundColor: "#f17800", // Cor de fundo ao passar o mouse (hover)
+                                }
+                            }}
+                        >
+                            Criar Modalidade
+                        </Button>
+                    </div>
+                    <div className="list">
+                        {modalidades.map((modalidade) => (
+                            <CardModalidade modalidade={modalidade} editalvel={true} />
+                        ))}
+                    </div>
+                </section>
+
+                <section>
+                    <div className="cabecalho">
+                        <h2>Lista de espaços</h2>
+                        <Button
+                            variant="contained"
+                            onClick={handleChangeModalidade}
+                            endIcon={<AddOutlinedIcon />}
+                            sx={{
+                                backgroundColor: "#F78B1F",  // Cor de fundo
+                                '&:hover': {
+                                    backgroundColor: "#f17800", // Cor de fundo ao passar o mouse (hover)
+                                }
+                            }}
+                        >
+                            Criar espaço
+                        </Button>
+                    </div>
+                    <div className="list">
+                        {espacos.map((espaco) => (
+                            <CardEspaco espaco={espaco} itens={itens} modalidades={modalidades} />
                         ))}
                     </div>
                 </section>
