@@ -14,6 +14,12 @@ export default function CardItem(params) {
     const [editMode, setEditMode] = useState(null);
     const [editedItem, setEditedItem] = useState({});
 
+    const handleCardClick = () => {
+        if (params.isClickable) {
+            params.onSelectItem(params.item.idItem); // Chama a função de callback recebida como prop
+        }
+    };
+
     const handleInputChange = (e, field) => {
         const value = e.target.value;
 
@@ -61,7 +67,6 @@ export default function CardItem(params) {
                     toast.error("Erro ao editar item!");
                 }
             }
-            
             // Desativa o modo de edição após salvar ou se não houver mudanças
             setEditMode(null);
         } else {
@@ -105,7 +110,10 @@ export default function CardItem(params) {
 
 
     return (
-        <div className="card cardItem">
+        <div
+            className={`card cardItem ${params.isClickable ? "clicavel" : ""} ${params.isSelected ? "selecionado" : ""}`}
+            onClick={params.isClickable ? handleCardClick : undefined}
+        >
             {editMode === params.item.idItem || params.item.Nome === "" ? (
                 <div className="cardContent contentInfo">
                     <input
@@ -144,7 +152,6 @@ export default function CardItem(params) {
                             />
                         </div>
                     )}
-
                 </div>
             ) : (
                 <div className="cardContent contentInfo">
@@ -155,54 +162,54 @@ export default function CardItem(params) {
                     </div>
                 </div>
             )}
-            <div className="cardContent contentButtons">
-
-                {params.item.Nome === "" ? (
-                    <button
-                        className="botao botaoEditar"
-
-                        onClick={() => {
-                            const body = { Nome: editedItem.Nome, QtdTotal: editedItem.QtdTotal, QtdDisponivel: editedItem.QtdTotal }
-                            criar({ tabela: "item", body: body })
-                                .then(() => {
-                                    toast.success('Item salvo com sucesso!');
-                                })
-                                .catch((error) => {
-                                    toast.error(`Erro ao salvar: ${error}`);
-                                });
-                        }}
-                    >
-                        <CheckIcon fontSize="small" />
-                    </button>
-                ) : (
-                    <>
-
+            {/* Esconde os botões se isClickable for true */}
+            {!params.isClickable && (
+                <div className="cardContent contentButtons">
+                    {params.item.Nome === "" ? (
                         <button
-                            className="botao botaoExcluir"
+                            className="botao botaoEditar"
                             onClick={() => {
-                                handleExcluir(params.idItem);
+                                const body = { Nome: editedItem.Nome, QtdTotal: editedItem.QtdTotal, QtdDisponivel: editedItem.QtdTotal };
+                                criar({ tabela: "item", body: body })
+                                    .then(() => {
+                                        toast.success('Item salvo com sucesso!');
+                                    })
+                                    .catch((error) => {
+                                        toast.error(`Erro ao salvar: ${error}`);
+                                    });
                             }}
                         >
-                            <DeleteIcon fontSize="small" />
+                            <CheckIcon fontSize="small" />
                         </button>
-                        {editMode === params.item.idItem ? (
+                    ) : (
+                        <>
                             <button
-                                className="botao botaoEditar"
-                                onClick={() => handleEdit(params.item.idItem)}
+                                className="botao botaoExcluir"
+                                onClick={() => {
+                                    handleExcluir(params.idItem);
+                                }}
                             >
-                                <CheckIcon fontSize="small" />
+                                <DeleteIcon fontSize="small" />
                             </button>
-                        ) : (
-                            <button
-                                className="botao botaoEditar"
-                                onClick={() => handleEdit(params.item.idItem)}
-                            >
-                                <EditIcon fontSize="small" />
-                            </button>
-                        )}
-                    </>
-                )}
-            </div>
+                            {editMode === params.item.idItem ? (
+                                <button
+                                    className="botao botaoEditar"
+                                    onClick={() => handleEdit(params.item.idItem)}
+                                >
+                                    <CheckIcon fontSize="small" />
+                                </button>
+                            ) : (
+                                <button
+                                    className="botao botaoEditar"
+                                    onClick={() => handleEdit(params.item.idItem)}
+                                >
+                                    <EditIcon fontSize="small" />
+                                </button>
+                            )}
+                        </>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

@@ -1,4 +1,4 @@
-.GerenciarEspaco {
+.GerenciarEspaco, .CriarEspaco {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -51,8 +51,17 @@
         border-radius: 6px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 
-
-
+        &.selecionado {
+          background-color: var(--laranja-principal);
+          color: white; 
+          border-color: var(--laranja-principal); 
+          
+          .cardContent {
+            p, .botao {
+              color: white; 
+            }
+          }
+        }
 
         .cardContent {
           display: flex;

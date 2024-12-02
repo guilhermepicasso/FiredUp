@@ -12,7 +12,7 @@ export default function CardModalidade(params) {
     const handleExcluir = (id) => {
         confirmAlert({
             title: 'Confirmar exclusão',
-            message: 'Você tem certeza que deseja excluir esta reserva?',
+            message: 'Você tem certeza que deseja excluir esta Modalidade?',
             buttons: [
                 {
                     label: 'Sim',

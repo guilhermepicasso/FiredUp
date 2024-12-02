@@ -20,6 +20,7 @@ import GerenciarEspacos from './Pages/GerenciarEspacos';
 import TermoDeUso from './components/Footer/TermoDeUso';
 import TermoDePrivacidade from './components/Footer/TermoDePrivacidade';
 import LoginADM from './Pages/LoginADM';
+import CriarEspaco from './Pages/GerenciarEspacos/CriarEspaco';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -34,6 +35,9 @@ root.render(
           <Route path='/HomeViewADM' element={<HomeViewADM />} />
           <Route path='/GerenciarReservas' element={<GerenciarReservas />} />
           <Route path='/GerenciarEspacos' element={<GerenciarEspacos />} />
+          <Route path='/CriarEspaco' element={<CriarEspaco />} />
+
+
 
           <Route path='/Espaco' element={<Espaco />} />
           <Route path='/Reservas' element={<Reservas />} />
