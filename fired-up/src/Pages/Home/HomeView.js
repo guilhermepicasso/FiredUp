@@ -4,22 +4,22 @@ import Modalidades from "./HomeComponents/Modalidades";
 import { useEffect, useState } from 'react';
 import Sobre from "./HomeComponents/Sobre";
 import Footer from "../../Components/Footer";
-import { buscarModalidades } from "../../API/chamadas";
+import { buscar } from "../../API/chamadas";
 
 function HomeView() {
   const [modalidades, setModalidades] = useState([]);
 
   useEffect(() => {
     const fetchModalidades = async () => {
-      try {
-        const modalidades = await buscarModalidades();
-        setModalidades(modalidades);
-      } catch (error) {
-        console.log(error);
-      }
+        try {
+            const modalidades = await buscar('modalidade');
+            setModalidades(modalidades);
+        } catch (error) {
+            console.log(error);
+        }
     }
     fetchModalidades();
-  }, [])
+}, [])
 
   // Função de rolagem
   const scrollToSection = (id) => {

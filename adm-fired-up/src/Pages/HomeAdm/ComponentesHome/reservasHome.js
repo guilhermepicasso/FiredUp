@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import ReservasTable from '../../../components/ReservasTable';
 import './index.scss'
 
 export default function ReservasHome(params) {
@@ -16,7 +17,7 @@ export default function ReservasHome(params) {
             </div>
             <p className="texto">*Nesta seção, são exibidos apenas os eventos mais próximos de ocorrer.</p>
             <div className="listaReservaPendente">
-                {/* Lista de Reservas pendentes */}
+                <ReservasTable />
             </div>
             <a className='botaoReservas'onClick={handleClick}>Ver Todas as Reservas</a>
         </section>

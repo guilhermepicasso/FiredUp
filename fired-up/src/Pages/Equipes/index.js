@@ -1,8 +1,8 @@
-import "./index.scss"
+import "./index.scss";
 
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { buscarEquipes, buscarModalidades } from '../../API/chamadas';
+import { buscar } from '../../API/chamadas';
 import { useAuth } from "../../Components/UserContext/AuthContext.js";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
@@ -12,20 +12,17 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import CardModalidae from '../../Components/CardModalidade';
-
+import Header from "../../Components/Header/index.js";
 
 export default function Equipes() {
-    const { isAuthenticated } = useAuth();
+    const { user, isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const [equipes, setEquipes] = useState([]);
     const location = useLocation();
-    const { id, img, modalidade } = location.state || {};
-    const [selectedModalidade, setSelectedModalidade] = useState({
-        id: id,
-        img: img,
-        modalidade: modalidade
-    });
+    const { modalidade } = location.state || {};
+    const [selectedModalidade, setSelectedModalidade] = useState(modalidade ? modalidade.idModalidade : "all");
     const [modalidades, setModalidades] = useState([]);
+    const [filteredEquipes, setFilteredEquipes] = useState([]);
 
     const handleButtonClick = () => {
         if (!isAuthenticated) {
@@ -33,89 +30,88 @@ export default function Equipes() {
                 <div>
                     <div>Você precisa estar logado para criar uma equipe</div>
                     <button
-                    style={{
-                        backgroundColor: "var(--laranja-principal)",
-                        border: "none",
-                        marginTop: '4%',
-                        padding: "2% 4%"
-                    }}
-                     onClick={() => {navigate("/Login"); toast.dismiss();}}
-                     >Fazer login</button>
+                        style={{
+                            backgroundColor: "var(--laranja-principal)",
+                            border: "none",
+                            marginTop: '4%',
+                            padding: "2% 4%"
+                        }}
+                        onClick={() => { navigate("/Login"); toast.dismiss(); }}
+                    >Fazer login</button>
                 </div>
             )
             return;
         } else {
-            navigate("/FormularioEquipe");
+            navigate("/FormularioEquipe", { state: { modalidades, user } });
         }
     };
 
     const handleChange = (event) => {
-        // Filtra para encontrar a modalidade correspondente
         const value = event.target.value;
-        if (value === "all") {
-            filteredEquipes = equipes
-            setSelectedModalidade({
-                id: 'all',
-                modalidade: 'Todos',
-                img: null
-            });
-        } else {
-            const modalidade = modalidades.find(mod => mod.idModalidade === Number(value));
+        setSelectedModalidade(value);
 
-            if (modalidade) {
-                setSelectedModalidade({
-                    id: modalidade.idModalidade,
-                    modalidade: modalidade.Nome,
-                    img: modalidade.Foto
-                });
-            }
+        if (value === "all") {
+            setFilteredEquipes(equipes);
+        } else {
+            const filtered = equipes.filter(equipe =>
+                equipe.idModalidade === value
+            );
+            setFilteredEquipes(filtered);
         }
     };
-
-    let filteredEquipes = equipes;
-
-    if (selectedModalidade.modalidade !== 'all') {
-        filteredEquipes = equipes.filter(equipe =>
-            equipe.idModalidade === selectedModalidade.id
-        );
-    }
 
     useEffect(() => {
         const busca = async () => {
             try {
-                const equipes = await buscarEquipes();
-                const modalidades = await buscarModalidades();
-
-                setModalidades(modalidades);
+                const equipes = await buscar('equipe');
+                const modalidades = await buscar('modalidade');
+    
+                // Ordena as modalidades antes de definir no estado
+                const modalidadesOrdenadas = modalidades.sort((a, b) => a.Nome.localeCompare(b.Nome));
+    
+                setModalidades(modalidadesOrdenadas); // Atualiza o estado com modalidades ordenadas
                 setEquipes(equipes);
-                console.log(equipes);
-                
-                console.log(modalidades);
-
+    
+                if (selectedModalidade === "all") {
+                    setFilteredEquipes(equipes);
+                } else {
+                    const filtered = equipes.filter(equipe =>
+                        equipe.idModalidade === selectedModalidade
+                    );
+                    setFilteredEquipes(filtered);
+                }
             } catch (error) {
-                console.log(error);
+                toast.error(error);
             }
-        }
+        };
+    
         busca();
-    }, [])
+    }, [selectedModalidade]);  
 
     return (
         <div className="Equipes">
+            <Header />
             <div className="opcao">
                 <label>Lista de equipes na modalidade </label>
-                <FormControl sx={{ m: 1, minWidth: 200, height: '20px' }}>
+                <FormControl sx={{ m: 1, minWidth: 'calc(180px + 3vw)',height: 'calc(15px + 2vw)' }}>
                     <Select
-                        value={selectedModalidade.id}
+                        value={selectedModalidade}
                         onChange={handleChange}
                         displayEmpty
                         inputProps={{ 'aria-label': 'Without label' }}
-                        sx={{ height: '30px' }}
+                        sx={{
+                            height: '100%', 
+                            width: '100%',
+                            fontSize: { xs: '16px', sm: '18px', md: '20px', lg: '22px' }, // Responsividade do texto
+                        }}
                     >
                         <MenuItem value="all">
                             <em>Todos</em>
                         </MenuItem>
                         {modalidades.map(modalidade => (
-                            <MenuItem key={modalidade.idModalidade} value={modalidade.idModalidade}>{modalidade.Nome}</MenuItem>
+                            <MenuItem key={modalidade.idModalidade} value={modalidade.idModalidade}>
+                                {modalidade.Nome}
+                            </MenuItem>
                         ))}
                     </Select>
                 </FormControl>
@@ -123,12 +119,15 @@ export default function Equipes() {
             </div>
             <div style={{ padding: '0 10%' }} className="listaEquipes">
                 {filteredEquipes.map(equipe => (
-                    // <div>{modalidades.find(m => m.idModalidade === 7)?.idModalidade} e {equipe.idModalidade}</div>
-                    <CardModalidae id={equipe.idEquipe} img={modalidades.find(modalidade =>
-                        modalidade.idModalidade === equipe.idModalidade)?.Foto} modalidade={modalidades.filter(modalidade =>
-                            equipe.idModalidade === modalidade.idModalidade)?.Nome} equipe={equipe}></CardModalidae>
+                    equipe.isPublica ? (
+                        <CardModalidae
+                            key={equipe.idEquipe}
+                            modalidade={modalidades.find(modalidade => equipe.idModalidade === modalidade.idModalidade)}
+                            equipe={equipe}
+                        />
+                    ) : null
                 ))}
             </div>
         </div>
-    )
+    );
 }

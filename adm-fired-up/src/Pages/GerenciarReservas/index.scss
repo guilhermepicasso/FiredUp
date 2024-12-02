@@ -1,0 +1,26 @@
+.GerenciarReserva {
+
+    .section {
+        margin-top: 5vh;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        min-height: 75vh;
+        gap: 5vh;
+
+        h1 {
+            padding: 0 10vw;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: max(14px, 2.5vw);
+            margin: 0;
+        }
+
+        .tabelaADM{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1vw;
+        }
+    }
+}

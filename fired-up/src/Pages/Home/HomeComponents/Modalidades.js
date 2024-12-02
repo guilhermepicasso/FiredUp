@@ -13,9 +13,7 @@ export default function Modalidades(params) {
       <div className="listaModalidades">
         {params.modalidades.map(modalidade => (
           <CardModalidade
-            id={modalidade.idModalidade}
-            img={modalidade.Foto}
-            modalidade={modalidade.Nome}
+            modalidade={modalidade}
           />
         ))}
       </div>

@@ -1,0 +1,77 @@
+.ComponenteReservaAdm {
+    width: 62vw;
+
+    .tabela {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+        thead {
+            background-color: var(--preto-principal);
+            color: var(--backcolor);
+
+            th {
+                padding: 0.5vw;
+                font-weight: bold;
+                font-size: 1vw;
+                text-align: center;
+            }
+        }
+
+        tbody {
+            tr {
+                &:nth-child(even) {
+                    background-color: var(--cinza);
+                }
+
+                &:nth-child(odd) {
+                    background-color: var(--backcolor);
+                }
+            }
+
+            td {
+                padding: 0.5vw;
+                color: var(--preto-principal);
+                font-size: 0.9vw;
+                text-align: center;
+            }
+        }
+    }
+
+    .botao {
+        margin: 0.26vw;
+        padding: 0.42vw 0.63vw;
+        font-size: 0.8vw;
+        cursor: pointer;
+        border: none;
+        border-radius: 4px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease-in-out;
+
+        &:hover {
+            transform: scale(1.1);
+        }
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    .autorizar {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .vetar{
+        background-color: var(--laranja-principal);
+        color: white;
+    }
+
+    .excluir {
+        background-color: #dc3545;
+        color: white;
+    }
+}

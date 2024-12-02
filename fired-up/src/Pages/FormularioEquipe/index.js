@@ -1,140 +1,132 @@
 import "./index.scss"
-import React, { useState, useEffect } from 'react';
-import { buscarModalidades, criarEquipe } from '../../API/chamadas.js';
-import { toast } from 'react-toastify'; 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-import axios from 'axios';
+import React, { useState } from 'react';
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
+import { create } from "../../API/chamadas";
+
+
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import Switch from '@mui/material/Switch';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 
 
 
 export default function FormularioEquipe() {
   const [nomeEquipe, setNomeEquipe] = useState('');
-  //const [local, setLocal] = useState('Quadra');
-  const [numeroMaximo, setNumeroMaximo] = useState('');
-  //const [data, setData] = useState('');
-  //const [horaInicio, setHoraInicio] = useState('');
-  //const [horaFim, setHoraFim] = useState('');
-  const [modalidade, setModalidade] = useState('Selecionar');
-  const [privacidade, setPrivacidade] = useState('Público');
-  const [modalidades, setModalidades] = useState([]);
+  const [qtdParticipantes, setQtdParticipantes] = useState(1);
+  const [modalidade, setModalidade] = useState("");
+  const location = useLocation();
+  const { modalidades = [], user } = location.state || {};
+  const [privacidade, setPrivacidade] = useState(false);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const carregarModalidades = async () => {
-      try {
-        const data = await buscarModalidades();
-        setModalidades(data);
-      } catch (error) {
-        toast.error("Erro ao carregar modalidades");
-      }
-    };
-    carregarModalidades();
-  }, []);
+  const label = { inputProps: { 'aria-label': 'Switch demo' } };
 
-  const handlePrivacidade = (tipo) => {
-    setPrivacidade(tipo); 
+  const closed = () => {
+    navigate(-1);
+  }
+
+  const handleToggle = () => {
+    if (privacidade) {
+setPrivacidade(false);
+    } else {
+      setPrivacidade(true);
+    }
+
   };
 
-  const criandoEquipe = async () => {
-    if (!nomeEquipe || !numeroMaximo || modalidade === 'Selecionar') {
-      toast.info("Por favor, preencha todos os campos");
+  const handleForms = async (e) => {
+    e.preventDefault();
+    if (!modalidade) {
+      toast.warning("Necessário selecionar uma modalidade")
       return;
     }
-
-    try {
-      const novaEquipe = {
-        NomeEquipe: nomeEquipe,
-        isPublica: privacidade === "Público", 
-        idResponsavel: 1, // Tem que ver esse item
-        QtdMaxima: numeroMaximo,
-        idModalidade: modalidades.find(mod => mod.Nome === modalidade)?.idModalidade 
-      };
-
-      const response = await criarEquipe(novaEquipe);
-      toast.success("Equipe criada com sucesso!");
-    } catch (error) {
-      toast.error("Erro ao criar equipe: " + error);
+    const body = {
+      "NomeEquipe": nomeEquipe,
+      "isPublica": !privacidade,
+      "idResponsavel": user.RA,
+      "QtdMaxima": qtdParticipantes,
+      "idModalidade": modalidade.idModalidade
     }
-  };
+    try {
+      const resp = await create('equipe', body)
+      if (resp.status === 200) {
+        toast.success("Equipe criada com sucesso!");
+        navigate(-1);
+      }
+
+    } catch (error) {
+      toast.error("Erro ao tentar criar equipe!");
+    }
+  }
+
 
   return (
-    <div className="nova-equipe-container">
-      <div className="nova-equipe">
-        <button className="close-button">✖</button>
-        <h2>Nova Equipe</h2>
-
-        <label>Nome da Equipe</label>
-        <input
-          type="text"
-          placeholder="Nome do time"
-          value={nomeEquipe}
-          onChange={(e) => setNomeEquipe(e.target.value)}
-        />
-
-        {/* <label>Local</label>
-        <select value={local} onChange={(e) => setLocal(e.target.value)}>
-          <option>Quadra</option>
-        </select> */}
-
-        <label> Número Máximo de Participantes</label>
-        <input
-          type="number"
-          placeholder=""
-          value={numeroMaximo}
-          onChange={(e) => setNumeroMaximo(e.target.value)}
-        />
-
-        {/* <label>Data do Evento</label>
-        <div className="data-evento">
-          <div className="input-icon">
-            <input
-              type="date"
-              value={data}
-              onChange={(e) => setData(e.target.value)}
+    <div className="formulario_equipe">
+      <div className="formulario_equipe_container">
+        <button className="close-button" onClick={() => { closed() }}>✖</button>
+        <Box
+          component="form"
+          sx={{ '& > :not(style)': { m: 1, width: '100%' } }}
+          noValidate
+          autoComplete="off"
+          onSubmit={handleForms}
+        >
+          <h1>Nova Equipe</h1>
+          <TextField
+            label="Nome da Equipe"
+            variant="outlined"
+            value={nomeEquipe}
+            onChange={(e) => setNomeEquipe(e.target.value)}
+            required
+          />
+          <div className="text_field">
+            <TextField fullWidth
+              type="number"
+              inputProps={{ min: 1 }}
+              label="Qtd. de participantes"
+              variant="outlined"
+              value={qtdParticipantes}
+              onChange={(e) => { setQtdParticipantes(e.target.value); }}
+              required
             />
+                <FormControl fullWidth>
+                  <InputLabel>Modalidade</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    value={modalidade || {}}
+                    label="Modalidade"
+                    onChange={(event) => setModalidade(event.target.value)}
+                  >
+                    {modalidades.map(modalidade => (
+                      <MenuItem key={modalidade.idModalidade} value={modalidade}>{modalidade.Nome}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
           </div>
-          <div className="input-icon">
-            <input
-              type="time"
-              value={horaInicio}
-              onChange={(e) => setHoraInicio(e.target.value)}
-              placeholder="Horário início"
+
+          <p>Tornar equipe privada
+            <Switch
+              {...label}
+              checked={privacidade}
+              onChange={handleToggle}
             />
-          </div>
-          <div className="input-icon">
-            <input
-              type="time"
-              value={horaFim}
-              onChange={(e) => setHoraFim(e.target.value)}
-              placeholder="Horário Fim"
-            />
-          </div>
-        </div> */}
+          </p>
 
-        <label>Modalidade</label>
-        <select value={modalidade} onChange={(e) => setModalidade(e.target.value)}>
-          <option>Selecionar</option>
-          {modalidades.map(mod => (
-            <option key={mod.idModalidade} value={mod.Nome}>{mod.Nome}</option>
-          ))}
-        </select>
-
-        <label>Privacidade</label>
-        <div className="privacidade">
-          <button
-            className={`public ${privacidade === "Público" ? "active" : ""}`}
-            onClick={() => handlePrivacidade("Público")} //true
-          >Público
-          </button>
-          <button
-            className={`private ${privacidade === "Privado" ? "active" : ""}`}
-            onClick={() => handlePrivacidade("Privado")} //false
-          >Privado
-          </button>
-        </div>
-
-        <button className="register-button" onClick={criandoEquipe}>Registro</button>
+          <Stack direction="row" spacing={2}>
+            <Button type="submit" variant="contained">
+              Criar Equipe
+            </Button>
+          </Stack>
+        </Box>
       </div>
+
     </div>
   );
 }
-

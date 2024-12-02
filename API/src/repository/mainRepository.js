@@ -8,10 +8,11 @@ const usuarios = [
 ];
 
 const admin = [
-    { RA: 'admin123456', nome: 'Admin 1' },
-    { RA: 'admin654321', nome: 'Admin 2' },
-    { RA: 'admin112233', nome: 'Admin 3' },
-    { RA: 'admin445566', nome: 'Admin 4' }
+    { RA: '223344', nome: 'Admin 1' },
+    { RA: '556677', nome: 'Admin 2' },
+    { RA: '778899', nome: 'Admin 3' },
+    { RA: '990011', nome: 'Admin 4' }
+
 ];
 
 export async function listarTodos(tabela) {
@@ -75,6 +76,22 @@ export async function listarReservasUsuario(id) {
     }
 }
 
+async function verificarHorarioExistente(idEspaco, diaSemana, horaInicio, horaFim) {
+    const query = `
+        SELECT COUNT(*) AS count
+        FROM HorarioFuncionamento
+        WHERE idEspaco = ? 
+        AND diaSemana = ?
+        AND NOT (
+            horaFim <= ? OR horaInicio >= ?
+        )
+    `;
+
+    const [result] = await con.query(query, [idEspaco, diaSemana, horaInicio, horaFim]);
+    const teste = result[0].count >= 1
+    return teste; // Retorna true se já existir um horário igual
+}
+
 export async function criar(tabela, body) {
     try {
         var customError = "";
@@ -99,34 +116,41 @@ export async function criar(tabela, body) {
             }
         }
 
-        var comando = `insert into ${tabela} (`;
+        if (tabela === "HorarioFuncionamento") {
+            const diasSemanaValidos = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 
-        // Obter as chaves do objeto body e iterar sobre elas
+            if (!diasSemanaValidos.includes(body.diaSemana)) {
+                customError = new Error(`Valor inválido para diaSemana: ${body.diaSemana}`);
+                customError.status = 400;
+                throw customError;
+            }
+
+            const verificacao = await verificarHorarioExistente(body.idEspaco, body.diaSemana, body.horaInicio, body.horaFim)
+            if (verificacao) {
+                customError = new Error(`Horario de funcionamento ja cadastrado!`);
+                customError.status = 400;
+                throw customError;
+            }
+        }
+
         const keys = Object.keys(body);
-        keys.forEach((key, index) => {
-            // Adicionar o campo e o valor dinâmico
+        const values = keys.map(key => {
             if (typeof body[key] === 'boolean') {
-                body[key] = body[key] ? 1 : 0;
+                return body[key] ? 1 : 0; // Transforma boolean em 1 ou 0
             }
-            comando += `${key}`;
-
-            // Adicionar uma vírgula se não for o último item
-            if (index < keys.length - 1) {
-                comando += ', ';
-            }
+            return body[key];
         });
 
-        comando += `) values (`;
-        comando += keys.map(key => `'${body[key]}'`);
-        comando += `)`;
-        
-        let [resp] = await con.query(comando);
+        // Construir comando SQL com placeholders
+        const comando = `INSERT INTO ${tabela} (${keys.join(', ')}) VALUES (${keys.map(() => '?').join(', ')})`;
+
+        // Executar o comando
+        const [resp] = await con.query(comando, values);
+
+        // Retornar resposta com ID gerado
         body.id = resp.insertId;
         return body;
     } catch (error) {
-
-
-
         if (error.code === 'ER_NO_REFERENCED_ROW_2') {
             customError = new Error(`O ID do ${tabela} é inválido.`);
             customError.status = 400;

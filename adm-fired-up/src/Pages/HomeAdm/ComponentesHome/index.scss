@@ -83,6 +83,8 @@ section {
 .listaReservaPendente {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
     min-width: 100%;
     gap: 5.7%;
     row-gap: 2vw;
