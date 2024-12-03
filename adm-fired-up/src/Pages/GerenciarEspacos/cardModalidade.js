@@ -9,6 +9,12 @@ import { deletar } from "../../API/chamadas";
 
 export default function CardModalidade(params) {
 
+    const handleCardClick = () => {
+        if (params.isClickable) {
+            params.onSelectModalidade(params.modalidade.idModalidade);
+        }
+    };
+
     const handleExcluir = (id) => {
         confirmAlert({
             title: 'Confirmar exclusão',
@@ -39,9 +45,12 @@ export default function CardModalidade(params) {
 
 
     return (
-        <div className="card cardModalidade">
+        <div
+            className={`card cardModalidade ${params.isClickable ? "clicavel" : ""} ${params.isSelected ? "selecionado" : ""}`}
+            onClick={params.isClickable ? handleCardClick : undefined}
+        >
             <p className="cardTitle">{params.modalidade.Nome}</p>
-            {params.editalvel && (
+            {(!params.isClickable && params.editalvel) && ( 
                 <div className="cardContent contentButtons">
                     <button
                         className="botao botaoExcluir"

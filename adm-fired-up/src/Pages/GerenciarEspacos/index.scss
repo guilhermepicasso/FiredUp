@@ -18,12 +18,48 @@
     padding: 4%;
     // gap: 6vw;
 
+    .inputs{
+      display: flex;
+      flex-direction: column;
+      align-items:start;
+      width: 100%;
+      padding: 2vw 0vw;
+
+      div{
+        display: flex;
+        flex-direction: row;
+        gap: 1vw;
+
+        .InputTexto, .AreadeTexto{
+          width: 30vw;
+          height: 3vh;
+          border: 1px solid #ccc;
+          color: var(--preto-principal);
+
+        }
+        .AreadeTexto{
+          height: 15vh;
+
+        }
+      }
+
+      label{
+        font-weight: bold;
+        font-size: 1.2vw;
+      }
+    }
+
     .cabecalho {
       display: flex;
       align-items: center;
       min-width: 100%;
       height: 5vw;
       gap: 2%;
+
+      p{
+        font-weight: bold;
+        font-size: 0.8vw;
+      }
     }
     .list {
       display: flex;
@@ -53,12 +89,12 @@
 
         &.selecionado {
           background-color: var(--laranja-principal);
-          color: white; 
+          color: white !important; 
           border-color: var(--laranja-principal); 
           
           .cardContent {
             p, .botao {
-              color: white; 
+              color: white !important; 
             }
           }
         }
