@@ -50,7 +50,7 @@ export default function CardModalidade(params) {
             onClick={params.isClickable ? handleCardClick : undefined}
         >
             <p className="cardTitle">{params.modalidade.Nome}</p>
-            {(!params.isClickable && params.editalvel) && ( 
+            {(!params.isClickable && params.editalvel) && (
                 <div className="cardContent contentButtons">
                     <button
                         className="botao botaoExcluir"

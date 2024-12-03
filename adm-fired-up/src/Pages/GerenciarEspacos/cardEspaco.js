@@ -160,7 +160,16 @@ export default function CardEspaco(params) {
                     </Button>
                     <Button
                         variant="contained"
-                        onClick={() => navigate(`/CriarEspaco/${params.espaco.idEspaco}/${itensEspaco}/${modalidadesEspaco}/${horariosEspaco}`)}
+                        onClick={() => 
+                            navigate('/CriarEspaco', {
+                                state: {
+                                    espaco: params.espaco,
+                                    itensEspaco: itensEspaco,
+                                    modalidadesEspaco: modalidadesEspaco,
+                                    horariosEspaco: horariosEspaco
+                                }
+                            })
+                        }
                         endIcon={<EditIcon />}
                         sx={{
                             backgroundColor: "#F78B1F"
