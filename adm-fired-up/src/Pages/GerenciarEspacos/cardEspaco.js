@@ -48,6 +48,8 @@ export default function CardEspaco(params) {
                 setItensEspaco(itens);
             } else {
                 setHorariosEspaco(result.data);
+                console.log(result.data);
+                
             }
         } catch (error) {
             if (error.status !== 404) {
@@ -166,7 +168,7 @@ export default function CardEspaco(params) {
                                     espaco: params.espaco,
                                     itensEspaco: itensEspaco,
                                     modalidadesEspaco: modalidadesEspaco,
-                                    horariosEspaco: horariosEspaco
+                                    horariosEspaco: horariosAgrupados
                                 }
                             })
                         }

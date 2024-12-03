@@ -5,19 +5,36 @@ import CardItem from "./cardItem";
 import { useLocation } from 'react-router-dom';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
 
 import { buscar } from "../../API/chamadas";
 
 function CriarEspaco() {
     const location = useLocation();
-    const { espaco, itensEspaco, modalidadesEspaco, horariosEspacos } = location.state || {};
+    const { espaco, itensEspaco, modalidadesEspaco, horariosEspaco } = location.state || {};
     const [itens, setItens] = useState([]);
     const [modalidades, setModalidades] = useState([]);
+    const [nomeEspaco, setNomeEspaco] = useState('');
+    const [regrasEspaco, setRegrasEspaco] = useState('');
     const [selectedItems, setSelectedItems] = useState([]);
     const [selectedModalidades, setSelectedModalidades] = useState([]);
-    const [nomeEspaco, setNomeEspaco] = useState('');
-    const [imagemEspaco, setImagemEspaco] = useState(null);
-    const [regrasEspaco, setRegrasEspaco] = useState('');
+    const [selectedDays, setSelectedDays] = useState([]);
+    const days = {
+        "Segunda": "Seg",
+        "Terça": "Ter",
+        "Quarta": "Qua",
+        "Quinta": "Qui",
+        "Sexta": "Sex",
+        "Sábado": "Sáb",
+        "Domingo": "Dom",
+    }
+    const [horaInicio, setHoraInicio] = useState("");
+    const [horaFim, setHoraFim] = useState("");
+    const [textarea, setTextarea] = useState("");
 
     useEffect(() => {
         async function carregarItens() {
@@ -49,6 +66,39 @@ function CriarEspaco() {
                         console.log("idModalidades é", idModalidades);
                         setSelectedModalidades(idModalidades);
                     }
+                    console.log("Horarios é", horariosEspaco);
+                    if (horariosEspaco) {
+                        let text = "";
+                        let x = []
+                        Object.entries(horariosEspaco).forEach(([dia, horarios]) => {
+                            text += `${dia} `;
+                            console.log(horarios);
+
+                            if (horarios.length > 0) {
+                                const horariosUnicos = [...new Set(horarios)]; // Remove duplicatas dentro do array de horários
+                                if (horariosUnicos.length > 0) {
+                                    text += `${dia} ${horariosUnicos.join(" e ")}\n`;
+                                }
+                            }
+                            x.push(text);
+                            text = ""
+                        });
+
+                        console.log(x);
+                        setTextarea(x)
+                    }
+                    // const dias = []
+                    // const hora_inicio = []
+                    // const hora_fim = []
+                    // horariosEspaco.forEach(horario => {
+                    //     dias.push(horario.diaSemana);
+                    //     hora_inicio.push(horario.HoraInicio);
+                    // });
+
+
+
+                    // setSelectedDays(dias);
+
                 }
                 setItens(dadosItem);
                 setModalidades(dadosModalidaes);
@@ -78,24 +128,22 @@ function CriarEspaco() {
         );
     };
 
-    const handleImagemChange = (event) => {
-        setImagemEspaco(event.target.files[0]);
-    };
-
-    const [alignment, setAlignment] = useState([]);
-    const days = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"]
-
-    const handleChange = (event, newAlignment) => {
-        if (alignment.includes(event.target.value)) {
-            // Se o item já estiver selecionado, desmarque-o
-            setAlignment(alignment.filter(item => item !== newAlignment));
-            console.log(alignment);
-            
+    const handleChange = (event) => {
+        if (selectedDays.includes(event.target.value)) {
+            // Remover o item selecionado
+            const updatedAlignment = selectedDays.filter(item => item !== event.target.value);
+            setSelectedDays(updatedAlignment);
+            console.log("Desmarcou o item:", event.target.value);
+            console.log("Lista agora contém:", updatedAlignment);
         } else {
-            // Caso contrário, adicione ao estado
-            setAlignment([...alignment, newAlignment]);
+            // Adicionar o item selecionado
+            const updatedAlignment = [...selectedDays, event.target.value];
+            setSelectedDays(updatedAlignment);
+            console.log("Marcou o item:", event.target.value);
+            console.log("Lista agora contém:", updatedAlignment);
         }
     };
+
 
     return (
         <div className="CriarEspaco">
@@ -166,38 +214,62 @@ function CriarEspaco() {
                         <p>*Selecione os itens clicando neles</p>
                     </div>
                     <div className="list">
-
-                        <textarea
-                            rows="5"
-                            cols="30"
-                            style={{
-                                overflowY: 'auto', /* Habilita a rolagem vertical */
-                                resize: 'vertical', /* Permite redimensionar o campo */
-                            }}
-                            value={horariosEspacos}
-                            readOnly={true} // O textarea é somente leitura se isEditable for falso
-                        />
-                        <ToggleButtonGroup
-                            // color="primary"
-                            value={alignment}
-                            exclusive
-                            onChange={handleChange}
-                            aria-label="Platform"
-                        >
-                            {days.map((day) => (
-                                <ToggleButton
-                                    value={day}
-                                    sx={{
-                                        backgroundColor: alignment.includes(day) ? "red" : "", // Laranja se selecionado
-                                        color: alignment.includes(day) ? "white" : "", // Texto branco se selecionado
-                                        '&:hover': {
-                                            backgroundColor: alignment.includes(day) ? "red" : "", // Laranja ao passar o mouse se selecionado
-                                        }
-                                    }}
-                                >{day}</ToggleButton>
-
+                        <div>
+                            {textarea && textarea.map((text) => (
+                                <p>{text}</p>
                             ))}
-                        </ToggleButtonGroup>
+                        </div>
+                        <div>
+
+                            <ToggleButtonGroup
+                                value={selectedDays}
+                                onChange={handleChange}
+                                aria-label="Platform"
+                            >
+                                {Object.entries(days).map(([key, value]) => (
+                                    <ToggleButton
+                                        key={key}
+                                        value={key}
+                                        sx={{
+                                            backgroundColor: selectedDays.includes(key) && "#f78b1f !important",
+                                            color: selectedDays.includes(key) ? "white" : "black",
+                                            '&:hover': {
+                                                backgroundColor: !selectedDays.includes(key) && "#f78b1f !important",
+                                            },
+                                        }}
+                                    >
+                                        {value}
+                                    </ToggleButton>
+                                ))}
+                            </ToggleButtonGroup>
+                            <div >
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DemoContainer components={['TimePicker']}>
+                                        <TimePicker
+                                            label="Hora Inicio"
+                                            viewRenderers={{
+                                                hours: renderTimeViewClock,
+                                                minutes: renderTimeViewClock,
+                                                seconds: renderTimeViewClock,
+                                            }}
+                                        />
+                                    </DemoContainer>
+                                </LocalizationProvider>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DemoContainer components={['TimePicker']}>
+                                        <TimePicker
+                                            label="Hora Fim"
+                                            viewRenderers={{
+                                                hours: renderTimeViewClock,
+                                                minutes: renderTimeViewClock,
+                                                seconds: renderTimeViewClock,
+                                            }}
+                                        />
+                                    </DemoContainer>
+                                </LocalizationProvider>
+                            </div>
+                        </div>
+
                     </div>
                 </section>
 
