@@ -1,9 +1,19 @@
 import { useEffect, useState } from "react"
 import Card from "./card"
-import { buscarId } from "../../API/chamadas"
+import { buscarId, deletar } from "../../API/chamadas"
 import CardModalidade from "./cardModalidade"
+import Button from '@mui/material/Button';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+
+
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 export default function CardEspaco(params) {
+    const navigate = useNavigate();
     const [modalidadesEspaco, setModalidadesEspaco] = useState([])
     const [itensEspaco, setItensEspaco] = useState([])
     const [horariosEspaco, setHorariosEspaco] = useState([])
@@ -47,6 +57,34 @@ export default function CardEspaco(params) {
         }
     }
 
+    const handleExcluir = (id) => {
+        confirmAlert({
+            title: 'Confirmar exclusão',
+            message: 'Você tem certeza que deseja excluir esta reserva?',
+            buttons: [
+                {
+                    label: 'Sim',
+                    onClick: () => {
+                        deletar({ tabela: "espaco", id })
+                            .then(() => {
+                                toast.success('Exclusão realizada com sucesso!');
+                                params.change("Espaco");
+                            })
+                            .catch((error) => {
+                                toast.error(`Erro ao excluir: ${error}`);
+                            });
+                    }
+                },
+                {
+                    label: 'Não',
+                    onClick: () => {
+                        toast.info('Exclusão cancelada');
+                    }
+                }
+            ]
+        });
+    };
+
     useEffect(() => {
         fetchInfo("modalidadeEspaco");
         fetchInfo("itemEspaco");
@@ -75,36 +113,67 @@ export default function CardEspaco(params) {
                 </div>
             </div>
 
-            <div>
-                <p className="cardTitle">Horario de funcionamento</p>
-                {horariosEspaco && (
-                    Object.keys(horariosAgrupados).map(dia => (
-                        <p key={dia}>
-                            {dia} {horariosAgrupados[dia].join(' e ')}
-                        </p>
-                    ))
-                )}
-            </div>
+            <div className="containerInfoEspaco">
+                <div className="containerInfo">
 
-            <div>
-                <p className="cardTitle">Modalidades que podem ser praticadas</p>
-                <div className="list">
-                    {modalidadesEspaco.map(modalidade => (
-                        <CardModalidade modalidade={modalidade} editalvel={false} />
-                    ))
-                    }
+                    <div className="infoEspaco">
+                        <p className="cardTitle">Horario de funcionamento</p>
+                        {horariosEspaco && (
+                            Object.keys(horariosAgrupados).map(dia => (
+                                <p key={dia}>
+                                    {dia} {horariosAgrupados[dia].join(' e ')}
+                                </p>
+                            ))
+                        )}
+                    </div>
+
+                    <div className="infoEspaco">
+                        <p className="cardTitle">Modalidades que podem ser praticadas</p>
+                        <div className="list">
+                            {modalidadesEspaco.map(modalidade => (
+                                <CardModalidade modalidade={modalidade} editalvel={false} />
+                            ))
+                            }
+                        </div>
+                    </div>
+
+                    <div className="infoEspaco">
+                        <p className="cardTitle">Itens que podem ser retirados</p>
+                        <div className="list listEspaco">
+                            {itensEspaco.map(item => (
+                                <CardModalidade modalidade={item} editalvel={false} />
+                            ))
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div className="botoesCardEspaco">
+                    <Button
+                        variant="contained"
+                        onClick={() => handleExcluir(params.espaco.idEspaco)}
+                        endIcon={<DeleteIcon />}
+                        sx={{
+                            backgroundColor: "red"
+                        }}
+                    >
+                        Excluir espaço
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={() => navigate(`/CriarEspaco/${params.espaco.idEspaco}/${itensEspaco}/${modalidadesEspaco}/${horariosEspaco}`)}
+                        endIcon={<EditIcon />}
+                        sx={{
+                            backgroundColor: "#F78B1F"
+                        }}
+                    >
+                        Editar espaço
+                    </Button>
+
                 </div>
             </div>
 
-            <div>
-                <p className="cardTitle">Itens que podem ser retirados</p>
-                <div className="list">
-                    {itensEspaco.map(item => (
-                        <CardModalidade modalidade={item} editalvel={false} />
-                    ))
-                    }
-                </div>
-            </div>
+
+
         </div>
     )
 

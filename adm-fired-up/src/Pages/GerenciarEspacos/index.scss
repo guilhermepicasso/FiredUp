@@ -90,10 +90,42 @@
         }
       }
 
-      .cardEspaco {
-        width: 100%;
-        align-items: baseline;
-      }
+      
     }
   }
 }
+
+.cardEspaco {
+  display: flex;
+  width: 100%;
+  min-height: 38vh;
+  max-height: fit-content;
+  justify-content:flex-start;
+  align-items: baseline;
+  
+  .containerInfoEspaco{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid;
+  
+    .containerInfo{
+      display: flex;
+      width: 100%;
+    }
+    
+    .infoEspaco{
+      width: 100%;
+    }
+  
+    .botoesCardEspaco{
+      display: flex;
+      gap: 2vw;
+    }
+  
+  }
+}
+

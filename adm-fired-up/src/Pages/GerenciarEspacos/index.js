@@ -5,17 +5,16 @@ import { v4 as uuidv4 } from 'uuid';
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import { buscar, criar } from "../../API/chamadas";
-import Button from '@mui/material/Button';
-import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import CardEspaco from "./cardEspaco";
-import CancelIcon from '@mui/icons-material/Cancel';
 import modalidadesJson from '../../../src/modalidades.json'
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import CardItem from "./cardItem";
 import CardModalidade from "./cardModalidade";
 import Dialog from '@mui/material/Dialog';
-
+import Button from '@mui/material/Button';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import CancelIcon from '@mui/icons-material/Cancel';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -237,7 +236,6 @@ function GerenciarEspaco() {
                     </div>
                     <div className="list">
                         {itens.map((item) => (
-
                             <CardItem key={item.idItem} item={item} />
                         ))}
                     </div>
@@ -286,7 +284,7 @@ function GerenciarEspaco() {
                     </div>
                     <div className="list">
                         {espacos.map((espaco) => (
-                            <CardEspaco espaco={espaco} itens={itens} modalidades={modalidades} />
+                            <CardEspaco change={change} espaco={espaco} itens={itens} modalidades={modalidades} />
                         ))}
                     </div>
                 </section>

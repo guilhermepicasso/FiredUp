@@ -35,7 +35,7 @@ root.render(
           <Route path='/HomeViewADM' element={<HomeViewADM />} />
           <Route path='/GerenciarReservas' element={<GerenciarReservas />} />
           <Route path='/GerenciarEspacos' element={<GerenciarEspacos />} />
-          <Route path='/CriarEspaco' element={<CriarEspaco />} />
+          <Route path='/CriarEspaco/:idEspaco/:itens/:modalidades/:horarios' element={<CriarEspaco />} />
 
 
 
