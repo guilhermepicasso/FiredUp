@@ -35,29 +35,33 @@ export default function CardEspaco(params) {
         try {
             const result = await buscarId({ tabela: tabela, busca: "idEspaco", id: params.espaco.idEspaco })
             if (tabela === "modalidadeEspaco") {
-                const modalidades = params.modalidades.filter(mod => mod.idModalidade === result.data[0].idModalidade);
-                modalidades.forEach(modalidade => {
-                    modalidade.idModalidadeEspaco = result.data[0].idModalidadeEspaco;
+                console.log("resultado das modalidadaes",result);
+                console.log("modalidades", params.modalidades);
+                const modalidades = []
+
+                result.data.forEach(modalidade => {
+                    const modalidade_encontrada = params.modalidades.find(mod => mod.idModalidade === modalidade.idModalidade);
+                    modalidade_encontrada.idModalidadeEspaco =  modalidade.idModalidadeEspaco
+                    console.log(modalidade_encontrada);
+                    modalidades.push(modalidade_encontrada)
                 });
                 setModalidadesEspaco(modalidades);
             } else if (tabela === "itemEspaco") {
-                console.log("result de itens esta vindo",result.data[0]);
-                
-                const itens = params.itens.filter(itensEspaco => itensEspaco.idItem === result.data[0].idItem);
-                itens.forEach(item => {
-                    item.idItemEspaco = result.data[0].idItemEspaco;
-                })
+                const itens = []
+
+                result.data.forEach(item => {
+                    const item_encontrado = params.itens.find(mod => mod.idItem === item.idItem);
+                    item_encontrado.idItemEspaco =  item.idItemEspaco
+                    itens.push(item_encontrado)
+                });
                 setItensEspaco(itens);
-                
             } else {
                 setHorariosEspaco(result.data);
-                console.log(result.data);
-                
             }
         } catch (error) {
             if (error.status !== 404) {
                 console.log(error);
-
+                toast.error("Erro ao buscar dados!")
             }
         }
     }

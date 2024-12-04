@@ -1,5 +1,5 @@
 import './index.scss';
-import { buscar, buscarId, alterar, deletar } from '../../API/chamadas';
+import { buscar, alterar, deletar } from '../../API/chamadas';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from "../UserContext/AuthContext.js";
@@ -70,7 +70,6 @@ function ReservasTable(params) {
 
   const handleStatus = (id, RA) => {
     const reserva = reservas.find((res) => res.idReserva === id);
-    console.log(Number(RA));
   
     if (reserva) {
       const newStatus = reserva.status ? 0 : 1;
@@ -109,12 +108,13 @@ function ReservasTable(params) {
   };
 
   const getEquipeResponsavel = (idEquipe) =>{
-    const equipe = equipes.find((eq)=> eq.idEquipe == idEquipe);
+    const equipe = equipes.find((eq)=> eq.idEquipe === idEquipe);
     return equipe ? equipe.idResponsavel:'Invalido';
   }
 
   return (
     <div className='ComponenteReservaAdm'>
+      <p>{user.RA}</p>
       <table className='tabela'>
         <thead className='tabelaHeader'>
           <tr>

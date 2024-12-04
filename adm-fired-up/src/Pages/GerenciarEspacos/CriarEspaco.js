@@ -2,7 +2,7 @@ import "./index.scss";
 import { useEffect, useState } from "react";
 import CardModalidade from "./cardModalidade";
 import CardItem from "./cardItem";
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate, useNavigation } from 'react-router-dom';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
@@ -20,6 +20,7 @@ import { toast } from "react-toastify";
 
 function CriarEspaco() {
     const location = useLocation();
+    const navigate = useNavigate();
     const { espaco, itensEspaco, modalidadesEspaco, horariosEspaco } = location.state || {};
     const [itens, setItens] = useState([]);
     const [modalidades, setModalidades] = useState([]);
@@ -118,56 +119,70 @@ function CriarEspaco() {
 
     const salvarNovoEspaco = async () => {
         if (nomeEspaco === "" || regrasEspaco === "") {
-            toast.warn("Todos os campos de texto precisam ser preenchidos! Verifique se o nome do espaço e as regras foram preenchidos!")
-            return
+            toast.warn("Todos os campos de texto precisam ser preenchidos! Verifique se o nome do espaço e as regras foram preenchidos!");
+            return;
         }
         try {
             const bodyEspaco = {
                 "Nome": nomeEspaco,
                 "Regras": regrasEspaco
-            }
+            };
             console.log("salvar espaco vai salvar ", bodyEspaco);
             const result = await criar({ tabela: "Espaco", body: bodyEspaco });
             console.log(result);
 
             if (result.status === 200) {
-                if (horariosAdd.length > 0) {
-                    horariosAdd.forEach(async item => {
-                        item.idEspaco = result.data.id
-                        const retorno = await criar({ tabela: "HorarioFuncionamento", body: item })
-                        console.log("Horarios de funcionamento salvos", retorno);
-                    });
-                    console.log(horariosAdd);
+                const espacoId = result.data.id;
 
+                if (horariosAdd.length > 0) {
+                    for (const item of horariosAdd) {
+                        item.idEspaco = espacoId;
+                        console.log("item pra salvar é ", item);
+
+                        const retorno = await criar({ tabela: "HorarioFuncionamento", body: item });
+                        console.log("Horarios de funcionamento salvos", retorno);
+                    }
                 }
+
                 if (selectedModalidades.length > 0) {
-                    selectedModalidades.forEach(async item => {
+                    for (const item of selectedModalidades) {
                         const bodyModalidade = {
                             "idModalidade": item,
-                            "idEspaco": result.data.id
-                        }
-                        const retorno = await criar({ tabela: "modalidadeEspaco", body: bodyModalidade })
-                        console.log("modalidades salvas ", retorno);
-                    });
+                            "idEspaco": espacoId
+                        };
+                        console.log("tentando salvar modalidade ", bodyModalidade);
+
+                        const retorno = await criar({ tabela: "ModalidadeEspaco", body: bodyModalidade });
+                        console.log("modalidade salva ", retorno);
+                    }
                 }
+
                 if (selectedItems.length > 0) {
-                    selectedItems.forEach(async item => {
+                    for (const item of selectedItems) {
                         const bodyIten = {
                             "idItem": item,
-                            "idEspaco": result.data.id
-                        }
-                        const retorno = await criar({ tabela: "itemEspaco", body: bodyIten })
+                            "idEspaco": espacoId
+                        };
+                        console.log("tentando salvar item", bodyIten);
+
+                        const retorno = await criar({ tabela: "ItemEspaco", body: bodyIten });
                         console.log("itens salvos ", retorno);
-                    });
+                    }
                 }
             }
+
+            toast.success("Espaço adicionado com sucesso!");
+            navigate(-1);
         } catch (error) {
-            toast.error("Erro ao salvar novo espaço!", error);
+            console.error("Erro ao salvar novo espaço!", error);
+            toast.error("Erro ao salvar novo espaço!");
         }
-    }
+    };
+
+
 
     const editarEspaco = async () => {
-        
+
         try {
             const bodyEspaco = {}
             if (espaco.Nome !== nomeEspaco) {
@@ -210,7 +225,7 @@ function CriarEspaco() {
                         "idEspaco": espaco.idEspaco
                     }
                     console.log("body de modalidadeespaco", body);
-                    
+
                     const retorno = await criar({ tabela: "modalidadeEspaco", body: body })
                     console.log("retorno é  ", retorno);
                 }
@@ -235,13 +250,15 @@ function CriarEspaco() {
             const horariosNaoExistentes = horariosAdd.filter(itemAdd =>
                 !horariosEspaco.some(itemEspaco => itemEspaco.idHorarioFuncionamento === itemAdd.idHorarioFuncionamento)
             );
+            
             if (horariosNaoExistentes.length > 0) {
                 horariosNaoExistentes.forEach(async horario => {
+                    horario.idEspaco = espaco.idEspaco;
                     await criar({ tabela: "HorarioFuncionamento", body: horario })
                 });
             }
             toast.success("Salvou alterações com sucesso!");
-
+            navigate(-1)
         } catch (error) {
             toast.warn("Erro ao alterar espaço!")
         }
@@ -439,7 +456,7 @@ function CriarEspaco() {
                         backgroundColor: "red"
                     }}
                 >
-                    Add novo Espaço
+                    { espaco ? "Salvar alterações": "Add novo Espaço"}
                 </Button>
 
 
