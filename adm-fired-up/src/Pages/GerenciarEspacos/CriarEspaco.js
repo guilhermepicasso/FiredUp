@@ -395,7 +395,7 @@ function CriarEspaco() {
                                     }
                                 }}
                                 sx={{
-                                    backgroundColor: "red"
+                                    backgroundColor: "#f78b1f"
                                 }}
                             >
                                 Add novo horário
@@ -430,13 +430,14 @@ function CriarEspaco() {
                     </div>
                 </section>
 
-                <Button
+                <Button className="BotaoNovoEspaco"
                     variant="contained"
                     onClick={() => espaco ? editarEspaco() :
                         salvarNovoEspaco()
                     }
                     sx={{
-                        backgroundColor: "red"
+                        backgroundColor: "#f78b1f",
+                        marginTop: "20px",
                     }}
                 >
                     Add novo Espaço
