@@ -10,8 +10,13 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
+import dayjs from 'dayjs';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Button from '@mui/material/Button';
 
-import { buscar } from "../../API/chamadas";
+import { alterar, buscar, criar, deletar } from "../../API/chamadas";
+import { toast } from "react-toastify";
 
 function CriarEspaco() {
     const location = useLocation();
@@ -32,9 +37,9 @@ function CriarEspaco() {
         "Sábado": "Sáb",
         "Domingo": "Dom",
     }
-    const [horaInicio, setHoraInicio] = useState("");
-    const [horaFim, setHoraFim] = useState("");
-    const [textarea, setTextarea] = useState("");
+    const [horariosAdd, setHorariosAdd] = useState(horariosEspaco ? horariosEspaco : []);
+    const [horaInicio, setHoraInicio] = useState(null);
+    const [horaFim, setHoraFim] = useState(null);
 
     useEffect(() => {
         async function carregarItens() {
@@ -66,39 +71,6 @@ function CriarEspaco() {
                         console.log("idModalidades é", idModalidades);
                         setSelectedModalidades(idModalidades);
                     }
-                    console.log("Horarios é", horariosEspaco);
-                    if (horariosEspaco) {
-                        let text = "";
-                        let x = []
-                        Object.entries(horariosEspaco).forEach(([dia, horarios]) => {
-                            text += `${dia} `;
-                            console.log(horarios);
-
-                            if (horarios.length > 0) {
-                                const horariosUnicos = [...new Set(horarios)]; // Remove duplicatas dentro do array de horários
-                                if (horariosUnicos.length > 0) {
-                                    text += `${dia} ${horariosUnicos.join(" e ")}\n`;
-                                }
-                            }
-                            x.push(text);
-                            text = ""
-                        });
-
-                        console.log(x);
-                        setTextarea(x)
-                    }
-                    // const dias = []
-                    // const hora_inicio = []
-                    // const hora_fim = []
-                    // horariosEspaco.forEach(horario => {
-                    //     dias.push(horario.diaSemana);
-                    //     hora_inicio.push(horario.HoraInicio);
-                    // });
-
-
-
-                    // setSelectedDays(dias);
-
                 }
                 setItens(dadosItem);
                 setModalidades(dadosModalidaes);
@@ -143,6 +115,138 @@ function CriarEspaco() {
             console.log("Lista agora contém:", updatedAlignment);
         }
     };
+
+    const salvarNovoEspaco = async () => {
+        if (nomeEspaco === "" || regrasEspaco === "") {
+            toast.warn("Todos os campos de texto precisam ser preenchidos! Verifique se o nome do espaço e as regras foram preenchidos!")
+            return
+        }
+        try {
+            const bodyEspaco = {
+                "Nome": nomeEspaco,
+                "Regras": regrasEspaco
+            }
+            console.log("salvar espaco vai salvar ", bodyEspaco);
+            const result = await criar({ tabela: "Espaco", body: bodyEspaco });
+            console.log(result);
+
+            if (result.status === 200) {
+                if (horariosAdd.length > 0) {
+                    horariosAdd.forEach(async item => {
+                        item.idEspaco = result.data.id
+                        const retorno = await criar({ tabela: "HorarioFuncionamento", body: item })
+                        console.log("Horarios de funcionamento salvos", retorno);
+                    });
+                    console.log(horariosAdd);
+
+                }
+                if (selectedModalidades.length > 0) {
+                    selectedModalidades.forEach(async item => {
+                        const bodyModalidade = {
+                            "idModalidade": item,
+                            "idEspaco": result.data.id
+                        }
+                        const retorno = await criar({ tabela: "modalidadeEspaco", body: bodyModalidade })
+                        console.log("modalidades salvas ", retorno);
+                    });
+                }
+                if (selectedItems.length > 0) {
+                    selectedItems.forEach(async item => {
+                        const bodyIten = {
+                            "idItem": item,
+                            "idEspaco": result.data.id
+                        }
+                        const retorno = await criar({ tabela: "itemEspaco", body: bodyIten })
+                        console.log("itens salvos ", retorno);
+                    });
+                }
+            }
+        } catch (error) {
+            toast.error("Erro ao salvar novo espaço!", error);
+        }
+    }
+
+    const editarEspaco = async () => {
+        
+        try {
+            const bodyEspaco = {}
+            if (espaco.Nome !== nomeEspaco) {
+                bodyEspaco.Nome = nomeEspaco;
+            }
+            if (espaco.Regras !== regrasEspaco) {
+                bodyEspaco.Regras = regrasEspaco
+            }
+            if (Object.keys(bodyEspaco).length > 0) {
+                await alterar({ tabela: "Espaco", id: espaco.idEspaco, body: bodyEspaco })
+            }
+
+            selectedItems.forEach(async item => {
+                // Verifique se o idItem de itensEspaco não está em selectedItems
+                const exists = itensEspaco.some(espaco => espaco.idItem === item);
+
+                if (!exists) {
+                    const bodyIten = {
+                        "idItem": item,
+                        "idEspaco": espaco.idEspaco
+                    }
+                    const retorno = await criar({ tabela: "itemEspaco", body: bodyIten })
+                    console.log("retorno é  ", retorno);
+                }
+            });
+
+            itensEspaco.forEach(async item => {
+                if (!selectedItems.includes(item.idItem)) {
+                    await deletar({ tabela: "ItemEspaco", id: item.idItemEspaco })
+                }
+            });
+
+            selectedModalidades.forEach(async item => {
+                // Verifique se o idItem de itensEspaco não está em selectedItems
+                const exists = modalidadesEspaco.some(espaco => espaco.idModalidade === item);
+
+                if (!exists) {
+                    const body = {
+                        "idModalidade": item,
+                        "idEspaco": espaco.idEspaco
+                    }
+                    console.log("body de modalidadeespaco", body);
+                    
+                    const retorno = await criar({ tabela: "modalidadeEspaco", body: body })
+                    console.log("retorno é  ", retorno);
+                }
+            });
+
+            modalidadesEspaco.forEach(async item => {
+                if (!selectedModalidades.includes(item.idModalidade)) {
+                    await deletar({ tabela: "ModalidadeEspaco", id: item.idModalidadeEspaco })
+                }
+            });
+
+            const horariosexcluidos = horariosEspaco.filter(itemAdd =>
+                !horariosAdd.some(itemEspaco => itemEspaco.idHorarioFuncionamento === itemAdd.idHorarioFuncionamento)
+            );
+
+            if (horariosexcluidos.length > 0) {
+                horariosexcluidos.forEach(async horario => {
+                    await deletar({ tabela: "HorarioFuncionamento", id: horario.idHorarioFuncionamento })
+                });
+            }
+
+            const horariosNaoExistentes = horariosAdd.filter(itemAdd =>
+                !horariosEspaco.some(itemEspaco => itemEspaco.idHorarioFuncionamento === itemAdd.idHorarioFuncionamento)
+            );
+            if (horariosNaoExistentes.length > 0) {
+                horariosNaoExistentes.forEach(async horario => {
+                    await criar({ tabela: "HorarioFuncionamento", body: horario })
+                });
+            }
+            toast.success("Salvou alterações com sucesso!");
+
+        } catch (error) {
+            toast.warn("Erro ao alterar espaço!")
+        }
+
+    }
 
 
     return (
@@ -213,12 +317,7 @@ function CriarEspaco() {
                         <h2>Horario de funcionamento</h2>
                         <p>*Selecione os itens clicando neles</p>
                     </div>
-                    <div className="list">
-                        <div>
-                            {textarea && textarea.map((text) => (
-                                <p>{text}</p>
-                            ))}
-                        </div>
+                    <div className="horarios">
                         <div>
 
                             <ToggleButtonGroup
@@ -247,6 +346,7 @@ function CriarEspaco() {
                                     <DemoContainer components={['TimePicker']}>
                                         <TimePicker
                                             label="Hora Inicio"
+                                            onChange={(newValue) => setHoraInicio(newValue)}
                                             viewRenderers={{
                                                 hours: renderTimeViewClock,
                                                 minutes: renderTimeViewClock,
@@ -258,7 +358,10 @@ function CriarEspaco() {
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DemoContainer components={['TimePicker']}>
                                         <TimePicker
+                                            // {horaInicio ? dayjs(horaInicio).format('hh:mm A') : "Hora Fim"}
                                             label="Hora Fim"
+                                            onChange={(newValue) => setHoraFim(newValue)}
+                                            minTime={horaInicio}
                                             viewRenderers={{
                                                 hours: renderTimeViewClock,
                                                 minutes: renderTimeViewClock,
@@ -268,10 +371,76 @@ function CriarEspaco() {
                                     </DemoContainer>
                                 </LocalizationProvider>
                             </div>
+                            <Button
+                                variant="contained"
+                                onClick={() => {
+                                    if (selectedDays.length === 0) {
+                                        toast.warn("Selecione ao menos um dia da semana!");
+                                    } else if (horaInicio === null) {
+                                        toast.warn("Selecione uma hora de inicio de funcionamento do espaço!");
+                                    } else if (horaFim === null) {
+                                        toast.warn("Selecione uma hora de encerramento do funcionamento do espaço!");
+                                    } else if (dayjs(horaFim).isBefore(dayjs(horaInicio))) {
+                                        // Verifica se horaFim é menor que horaInicio
+                                        toast.warn("A hora de fim deve ser maior que a hora de início!");
+                                    } else {
+                                        selectedDays.forEach(day => {
+                                            const body = {
+                                                diaSemana: day,
+                                                horaInicio: dayjs(horaInicio).format('HH:mm:ss'),
+                                                horaFim: dayjs(horaFim).format('HH:mm:ss')
+                                            }
+                                            setHorariosAdd(prevHorarios => [...prevHorarios, body]);
+                                        });
+                                    }
+                                }}
+                                sx={{
+                                    backgroundColor: "red"
+                                }}
+                            >
+                                Add novo horário
+                            </Button>
+                        </div>
+
+                        <div className="horariosList" >
+                            {horariosAdd && horariosAdd.map((horario) =>
+                                <div className="horarioItem">
+                                    <p>{`${horario.diaSemana} das ${horario.horaInicio} as ${horario.horaFim}`}</p>
+                                    <IconButton
+                                        aria-label="delete"
+                                        size="small"
+                                        onClick={() => {
+                                            const index = horariosAdd.findIndex(item => item.idHorarioFuncionamento === horario.idHorarioFuncionamento);
+
+                                            if (index !== -1) {
+                                                setHorariosAdd(prevHorarios => {
+                                                    const novosHorarios = [...prevHorarios];
+                                                    novosHorarios.splice(index, 1);
+                                                    return novosHorarios;
+                                                });
+                                            }
+                                        }}
+                                    >
+                                        <DeleteIcon fontSize="small" />
+                                    </IconButton>
+                                </div>
+                            )}
                         </div>
 
                     </div>
                 </section>
+
+                <Button
+                    variant="contained"
+                    onClick={() => espaco ? editarEspaco() :
+                        salvarNovoEspaco()
+                    }
+                    sx={{
+                        backgroundColor: "red"
+                    }}
+                >
+                    Add novo Espaço
+                </Button>
 
 
             </div>
