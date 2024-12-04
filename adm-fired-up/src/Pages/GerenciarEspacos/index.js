@@ -21,8 +21,10 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 function GerenciarEspaco() {
+    const navigate = useNavigate();
     const [itens, setItens] = useState([]);
     const [modalidades, setModalidades] = useState([]);
     const [espacos, setEspacos] = useState([]);
@@ -270,7 +272,7 @@ function GerenciarEspaco() {
                         <h2>Lista de espaços</h2>
                         <Button
                             variant="contained"
-                            onClick={handleChangeModalidade}
+                            onClick={() => navigate("/CriarEspaco")}
                             endIcon={<AddOutlinedIcon />}
                             sx={{
                                 backgroundColor: "#F78B1F",  // Cor de fundo
