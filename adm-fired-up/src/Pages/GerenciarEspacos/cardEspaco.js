@@ -41,11 +41,14 @@ export default function CardEspaco(params) {
                 });
                 setModalidadesEspaco(modalidades);
             } else if (tabela === "itemEspaco") {
+                console.log("result de itens esta vindo",result.data[0]);
+                
                 const itens = params.itens.filter(itensEspaco => itensEspaco.idItem === result.data[0].idItem);
                 itens.forEach(item => {
                     item.idItemEspaco = result.data[0].idItemEspaco;
                 })
                 setItensEspaco(itens);
+                
             } else {
                 setHorariosEspaco(result.data);
                 console.log(result.data);
@@ -165,7 +168,7 @@ export default function CardEspaco(params) {
                                     espaco: params.espaco,
                                     itensEspaco: itensEspaco,
                                     modalidadesEspaco: modalidadesEspaco,
-                                    horariosEspaco: horariosAgrupados
+                                    horariosEspaco: horariosEspaco
                                 }
                             })
                         }

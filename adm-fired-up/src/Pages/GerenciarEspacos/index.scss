@@ -171,3 +171,24 @@
   }
 }
 
+.horarios{
+  display: flex;
+  width: 100%;
+  gap: 4vw;
+}
+
+.horariosList{
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  .horarioItem{
+    width: 100%;
+    text-wrap: nowrap;
+    display: flex;
+    justify-content: space-between;   
+    border: 1px solid;
+    gap: 2vw;
+  }
+}
+
+

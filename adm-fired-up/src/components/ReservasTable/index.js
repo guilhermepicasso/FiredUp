@@ -68,7 +68,7 @@ function ReservasTable(params) {
     });
   };
 
-  const handleStatus = (id,RA) => {
+  const handleStatus = (id, RA) => {
     const reserva = reservas.find((res) => res.idReserva === id);
     console.log(Number(RA));
   
