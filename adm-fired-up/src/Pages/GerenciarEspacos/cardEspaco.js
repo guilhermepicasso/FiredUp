@@ -65,7 +65,7 @@ export default function CardEspaco(params) {
     const handleExcluir = (id) => {
         confirmAlert({
             title: 'Confirmar exclusão',
-            message: 'Você tem certeza que deseja excluir esta reserva?',
+            message: 'Você tem certeza que deseja excluir este espaço ?',
             buttons: [
                 {
                     label: 'Sim',
@@ -99,10 +99,7 @@ export default function CardEspaco(params) {
     return (
         <div className="card cardEspaco">
             <div>
-                <div>
-                    <img src={params.espaco.Foto} alt={`Foto da ${params.espaco.Nome}`} />
-                </div>
-                <p className="cardTitle">{params.espaco.idEspaco}</p>
+                <p className="cardTitle">{params.espaco.Nome}</p>
                 <div>
                     <p>Regras</p>
                     <textarea

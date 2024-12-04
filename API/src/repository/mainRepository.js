@@ -169,7 +169,11 @@ export async function alterar(tabela, id, body) {
         var comando = `UPDATE ${tabela} SET `;
         const keys = Object.keys(body);
         keys.forEach((key, index) => {
-            comando += `${key} = '${body[key]}'`;
+            let value = body[key];
+            if (typeof value === "boolean") {
+                value = value ? 1 : 0; // Conversão de bool 1 ou 0
+            }
+            comando += `${key} = '${value}'`;
             if (index < keys.length - 1) {
                 comando += ', ';
             }

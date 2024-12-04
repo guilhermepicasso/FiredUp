@@ -83,7 +83,7 @@ export default function CardItem(params) {
     const handleExcluir = (id) => {
         confirmAlert({
             title: 'Confirmar exclusão',
-            message: 'Você tem certeza que deseja excluir esta reserva?',
+            message: 'Você tem certeza que deseja excluir este Item?',
             buttons: [
                 {
                     label: 'Sim',
@@ -186,7 +186,7 @@ export default function CardItem(params) {
                             <button
                                 className="botao botaoExcluir"
                                 onClick={() => {
-                                    handleExcluir(params.idItem);
+                                    handleExcluir(params.item.idItem);
                                 }}
                             >
                                 <DeleteIcon fontSize="small" />

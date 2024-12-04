@@ -16,6 +16,7 @@ export default function CardEquipe(params) {
     const [open, setOpen] = useState(false);
     const [openForms, setOpenForms] = useState(false);
     const [description, setDescription] = useState(false);
+    const [espacos, setEspacos] = useState([]);
     const [type, setType] = useState(false);
 
 
@@ -67,6 +68,10 @@ export default function CardEquipe(params) {
             buscarQtdParticipantes();
             buscarReservaEquipe();
         }
+        buscar('Espaco')
+            .then((data) => setEspacos(data))
+            .catch((error) => toast.error('Erro ao buscar dados de Espaços', error));
+
     }, [equipe, dadosReserva.status]);
 
     // Verifica se a equipe foi passada corretamente
@@ -109,6 +114,11 @@ export default function CardEquipe(params) {
         setOpenForms(false); // Atualiza o estado para fechar o diálogo
     };
 
+    const getEspacoNome = (idEspaco) => {
+        const espaco = espacos.find((esp) => esp.idEspaco === idEspaco);
+        return espaco ? espaco.Nome : 'Não Encontrado';
+      };
+
     return (
         <div className="card_equipe" key={equipe.idEquipe}>
             <FormsReserva
@@ -129,7 +139,7 @@ export default function CardEquipe(params) {
                     await buscarQtdParticipantes();
                     await buscarReservaEquipe();
                     if (params.onDataChanged) {
-                        params.onDataChanged(); 
+                        params.onDataChanged();
                     }
                 }}
             />
@@ -147,7 +157,7 @@ export default function CardEquipe(params) {
                 {(dadosReserva.status === 1 || dadosReserva.status === 0) &&
                     <div className="reserva">
                         <p className="titulo">Dados da reserva</p>
-                        <p>Espaço: {dadosReserva.idEspaco}</p>
+                        <p>Espaço: {getEspacoNome(dadosReserva.idEspaco)}</p>
                         <p>Dia: {converterData(dadosReserva.DataReserva)}</p>
                         <p>Inicio: {dadosReserva.HoraInicio.slice(0, 5)}</p>
                     </div>
@@ -162,7 +172,11 @@ export default function CardEquipe(params) {
             {my ? (
                 <div className="acoes">
                     <button
-                        onClick={() => handleReservarEspaco()}
+                        onClick={() => {
+                            if (dadosReserva.status === null || dadosReserva.status === 0) {
+                                handleReservarEspaco();
+                            }
+                        }}
                         className={dadosReserva.status === null
                             ? 'btn-success'
                             : dadosReserva.status === 0
@@ -178,20 +192,20 @@ export default function CardEquipe(params) {
                         }
                     </button>
                     <button
-                    className='btn-cancel'
-                    onClick={() => {
-                        if (dadosReserva.status === null) {
-                            handleClickOpen("deletar_equipe");  // Se status for null, abre "Deletar Equipe"
-                        } else {
-                            handleClickOpen("cancelar_reserva"); // 0 ou 1, abre "Cancelar Reserva"
+                        className='btn-cancel'
+                        onClick={() => {
+                            if (dadosReserva.status === null) {
+                                handleClickOpen("deletar_equipe");  // Se status for null, abre "Deletar Equipe"
+                            } else {
+                                handleClickOpen("cancelar_reserva"); // 0 ou 1, abre "Cancelar Reserva"
+                            }
+                        }}
+                    >
+                        {dadosReserva.status === null
+                            ? 'Deletar Equipe'  // Para Status null, "Deletar Equipe"
+                            : 'Cancelar Reserva'  // Para Status 0 ou 1, "Cancelar Reserva"
                         }
-                    }}
-                >
-                    {dadosReserva.status === null
-                        ? 'Deletar Equipe'  // Para Status null, "Deletar Equipe"
-                        : 'Cancelar Reserva'  // Para Status 0 ou 1, "Cancelar Reserva"
-                    }
-                </button>
+                    </button>
                 </div>
             ) : (
                 <div className="acoes">
