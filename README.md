@@ -19,7 +19,7 @@ O projeto está organizado em pastas distintas para facilitar a manutenção e o
 
 1. **Clone o repositório:**
    ```bash
-   git clone [https://github.com/AliePonzani/FiredUp.git]
+   git clone [https://github.com/guilhermepicasso/FiredUp.git]
 
 2. **Instale as Dependências:**
 
